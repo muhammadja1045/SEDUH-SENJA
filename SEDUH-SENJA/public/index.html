@@ -1,0 +1,428 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#241A16">
+
+    <title>SEDUH SENJA | Dashboard Inventory</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <h1>SEDUH SENJA</h1>
+            <p>COFFEE INVENTORY SYSTEM</p>
+        </div>
+
+        <p class="menu-title">MENU UTAMA</p>
+
+        <nav class="nav-menu">
+
+            <a href="/" class="nav-link active">
+                <span class="nav-icon">⌂</span>
+                Dashboard
+            </a>
+
+            <a href="/inventory" class="nav-link">
+                <span class="nav-icon">▦</span>
+                Inventaris
+            </a>
+
+            <a href="/stock-in" class="nav-link">
+                <span class="nav-icon">↙</span>
+                Barang Masuk
+            </a>
+
+            <a href="/stock-out" class="nav-link">
+                <span class="nav-icon">↗</span>
+                Barang Keluar
+            </a>
+
+            <a href="/categories" class="nav-link">
+                <span class="nav-icon">▤</span>
+                Kategori
+            </a>
+
+            <a href="/suppliers" class="nav-link">
+                <span class="nav-icon">♙</span>
+                Supplier
+            </a>
+
+        </nav>
+
+        <p class="menu-title">LAINNYA</p>
+
+        <nav class="nav-menu">
+
+            <a href="/reports" class="nav-link">
+                <span class="nav-icon">▧</span>
+                Laporan
+            </a>
+
+            <a href="/settings" class="nav-link">
+                <span class="nav-icon">⚙</span>
+                Pengaturan
+            </a>
+
+        </nav>
+
+        <div class="sidebar-footer">
+            SEDUH SENJA<br>
+            Inventory Management System<br>
+            Version 1.0.0
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+
+            <div class="page-heading">
+                <h2>Dashboard Overview</h2>
+                <p>Selamat datang di sistem inventaris Seduh Senja.</p>
+            </div>
+
+            <div class="admin-profile">
+                <div class="avatar">A</div>
+
+                <div class="admin-info">
+                    <strong>Administrator</strong>
+                    <span>System Admin</span>
+                </div>
+            </div>
+
+        </header>
+
+
+        <!-- WELCOME CARD -->
+        <section class="welcome-card">
+
+            <div>
+                <h3>Selamat Datang di Seduh Senja</h3>
+
+                <p>
+                    Kelola persediaan bahan baku dan kebutuhan coffee shop
+                    dengan lebih mudah, terstruktur, dan efisien.
+                </p>
+            </div>
+
+            <div class="welcome-icon">☕</div>
+
+        </section>
+
+
+        <!-- STATISTICS -->
+        <div class="section-heading">
+
+            <h3>Ringkasan Inventaris</h3>
+
+            <span id="lastUpdated">
+                Memuat data...
+            </span>
+
+        </div>
+
+
+        <section class="stats-grid">
+
+            <!-- TOTAL PRODUK -->
+            <div class="stat-card">
+
+                <div class="stat-top">
+                    <span class="stat-label">TOTAL BARANG</span>
+                    <span class="stat-icon icon-brown">▦</span>
+                </div>
+
+                <div class="stat-value" id="totalProducts">0</div>
+
+                <p class="stat-note">
+                    Jenis produk terdaftar
+                </p>
+
+            </div>
+
+
+            <!-- BARANG MASUK -->
+            <div class="stat-card">
+
+                <div class="stat-top">
+                    <span class="stat-label">BARANG MASUK HARI INI</span>
+                    <span class="stat-icon icon-green">↓</span>
+                </div>
+
+                <div class="stat-value" id="stockIn">0</div>
+
+                <p class="stat-note">
+                    Total jumlah barang masuk
+                </p>
+
+            </div>
+
+
+            <!-- BARANG KELUAR -->
+            <div class="stat-card">
+
+                <div class="stat-top">
+                    <span class="stat-label">BARANG KELUAR HARI INI</span>
+                    <span class="stat-icon icon-beige">↑</span>
+                </div>
+
+                <div class="stat-value" id="stockOut">0</div>
+
+                <p class="stat-note">
+                    Total jumlah barang keluar
+                </p>
+
+            </div>
+
+
+            <!-- STOK MENIPIS -->
+            <div class="stat-card">
+
+                <div class="stat-top">
+                    <span class="stat-label">STOK MENIPIS</span>
+                    <span class="stat-icon icon-red">!</span>
+                </div>
+
+                <div class="stat-value" id="lowStock">0</div>
+
+                <p class="stat-note">
+                    Produk perlu diperhatikan
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- CHART AND STOCK SUMMARY -->
+        <section class="content-grid">
+
+
+            <!-- ACTIVITY CHART -->
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h3>Aktivitas Inventaris</h3>
+
+                    <span>Ilustrasi mingguan</span>
+
+                </div>
+
+
+                <div class="chart">
+
+                    <div class="chart-column">
+                        <div class="chart-bars">
+                            <div class="bar" style="height:35%"></div>
+                            <div class="bar out" style="height:20%"></div>
+                        </div>
+                        <small>Sen</small>
+                    </div>
+
+                    <div class="chart-column">
+                        <div class="chart-bars">
+                            <div class="bar" style="height:65%"></div>
+                            <div class="bar out" style="height:30%"></div>
+                        </div>
+                        <small>Sel</small>
+                    </div>
+
+                    <div class="chart-column">
+                        <div class="chart-bars">
+                            <div class="bar" style="height:45%"></div>
+                            <div class="bar out" style="height:25%"></div>
+                        </div>
+                        <small>Rab</small>
+                    </div>
+
+                    <div class="chart-column">
+                        <div class="chart-bars">
+                            <div class="bar" style="height:85%"></div>
+                            <div class="bar out" style="height:45%"></div>
+                        </div>
+                        <small>Kam</small>
+                    </div>
+
+                    <div class="chart-column">
+                        <div class="chart-bars">
+                            <div class="bar" style="height:55%"></div>
+                            <div class="bar out" style="height:35%"></div>
+                        </div>
+                        <small>Jum</small>
+                    </div>
+
+                    <div class="chart-column">
+                        <div class="chart-bars">
+                            <div class="bar" style="height:70%"></div>
+                            <div class="bar out" style="height:40%"></div>
+                        </div>
+                        <small>Sab</small>
+                    </div>
+
+                    <div class="chart-column">
+                        <div class="chart-bars">
+                            <div class="bar" style="height:30%"></div>
+                            <div class="bar out" style="height:15%"></div>
+                        </div>
+                        <small>Min</small>
+                    </div>
+
+                </div>
+
+
+                <div class="chart-legend">
+
+                    <div class="legend-item">
+                        <span class="legend-dot"></span>
+                        Barang masuk
+                    </div>
+
+                    <div class="legend-item">
+                        <span class="legend-dot out"></span>
+                        Barang keluar
+                    </div>
+
+                </div>
+
+                <p class="stat-note" style="margin-top:15px">
+                    Grafik saat ini masih berupa ilustrasi.
+                    Integrasi data transaksi mingguan akan dibuat pada tahap laporan.
+                </p>
+
+            </div>
+
+
+            <!-- STOCK SUMMARY -->
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h3>Ringkasan Sisa Stok</h3>
+
+                    <span>Berdasarkan satuan</span>
+
+                </div>
+
+
+                <div class="stock-status" id="unitSummary">
+
+                    <div class="stock-row">
+                        <span>Memuat data...</span>
+                        <strong>...</strong>
+                    </div>
+
+                </div>
+
+
+                <p class="stat-note" style="margin-top:20px">
+
+                    Stok ditampilkan terpisah berdasarkan satuan
+                    agar Kg, Liter, dan Pcs tidak dijumlahkan secara keliru.
+
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- PRODUCT TABLE -->
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <h3>Produk Terbaru</h3>
+
+                <a href="/inventory" class="text-link">
+                    Lihat semua produk →
+                </a>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>KODE</th>
+                            <th>NAMA BARANG</th>
+                            <th>KATEGORI</th>
+                            <th>STOK</th>
+                            <th>STATUS</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="productTable">
+
+                        <tr>
+
+                            <td colspan="5" class="empty-state">
+                                Memuat data produk...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- CONNECTION STATUS -->
+        <p
+            id="connectionStatus"
+            class="stat-note"
+            style="margin-top:18px"
+            role="status"
+        >
+            Menghubungkan ke database...
+        </p>
+
+
+        <!-- FOOTER -->
+        <footer style="margin-top:30px;padding:20px 0;text-align:center">
+
+            <p class="stat-note">
+                © 2026 SEDUH SENJA — Coffee Inventory Management System
+            </p>
+
+        </footer>
+
+    </main>
+
+</div>
+
+
+<!-- DASHBOARD JAVASCRIPT -->
+<script src="/js/dashboard.js"></script>
+
+</body>
+</html>

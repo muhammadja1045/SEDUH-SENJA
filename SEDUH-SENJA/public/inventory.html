@@ -1,0 +1,705 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#241A16">
+
+    <title>Inventaris | SEDUH SENJA</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        :root {
+            --coffee: #6F4E37;
+            --coffee-dark: #241A16;
+            --cream: #F7F3ED;
+            --muted: #A99A8D;
+            --border: #E8DED2;
+            --green: #287A48;
+            --red: #B84A3A;
+        }
+
+        .inventory-page {
+            padding: 30px;
+            color: #F5EBDD;
+        }
+
+        .inventory-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 26px;
+            flex-wrap: wrap;
+        }
+
+        .inventory-heading .eyebrow {
+            color: #B58A62;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        .inventory-heading h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 34px;
+            margin: 8px 0;
+        }
+
+        .inventory-heading p {
+            color: #B9AAA0;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .primary-btn {
+            background: #8A6245;
+            color: white;
+            border: none;
+            border-radius: 9px;
+            padding: 13px 18px;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .primary-btn:hover {
+            background: #6F4E37;
+            transform: translateY(-1px);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .summary-card {
+            background: #30231D;
+            border: 1px solid rgba(255,255,255,.06);
+            border-radius: 13px;
+            padding: 20px;
+        }
+
+        .summary-card span {
+            color: #B9AAA0;
+            font-size: 12px;
+        }
+
+        .summary-card h2 {
+            font-size: 27px;
+            margin: 10px 0 0;
+            color: #F5EBDD;
+        }
+
+        .summary-icon {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .inventory-card {
+            background: var(--cream);
+            color: var(--coffee-dark);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 25px rgba(0,0,0,.12);
+        }
+
+        .inventory-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .inventory-card-header h2 {
+            margin: 0;
+            font-size: 19px;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .toolbar input,
+        .toolbar select {
+            padding: 11px 13px;
+            border: 1px solid #DED2C3;
+            border-radius: 8px;
+            background: white;
+            color: #241A16;
+            font: inherit;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .toolbar input {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .toolbar select {
+            min-width: 160px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        .inventory-table {
+            width: 100%;
+            min-width: 850px;
+            border-collapse: collapse;
+        }
+
+        .inventory-table th,
+        .inventory-table td {
+            text-align: left;
+            padding: 15px 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        .inventory-table th {
+            color: #806044;
+            font-size: 11px;
+            letter-spacing: .6px;
+            font-weight: 800;
+        }
+
+        .inventory-table td {
+            color: #46372D;
+        }
+
+        .product-name {
+            font-weight: 700;
+            color: #30231D !important;
+        }
+
+        .product-code {
+            color: #98704E !important;
+            font-weight: 700;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .status-safe {
+            background: #DCEFE2;
+            color: #287A48;
+        }
+
+        .status-low {
+            background: #F9E7D4;
+            color: #A56320;
+        }
+
+        .status-empty {
+            background: #F5DEDA;
+            color: #B84A3A;
+        }
+
+        .action-group {
+            display: flex;
+            gap: 7px;
+        }
+
+        .action-btn {
+            border: 0;
+            border-radius: 6px;
+            padding: 7px 10px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .edit-btn {
+            background: #E8DED2;
+            color: #63452F;
+        }
+
+        .archive-btn {
+            background: #F5DEDA;
+            color: #B84A3A;
+        }
+
+        .empty-state {
+            text-align: center !important;
+            padding: 35px !important;
+            color: #95877C !important;
+        }
+
+        .connection-status {
+            color: #B9AAA0;
+            font-size: 12px;
+            margin-top: 16px;
+        }
+
+        /* MODAL FORM */
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(10,7,5,.75);
+            padding: 20px;
+            overflow-y: auto;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #F7F3ED;
+            color: #241A16;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 16px;
+            padding: 27px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.3);
+            margin: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 22px;
+        }
+
+        .modal-header h2 {
+            font-size: 21px;
+            margin: 0;
+        }
+
+        .close-modal {
+            background: transparent;
+            border: none;
+            font-size: 25px;
+            color: #806044;
+            cursor: pointer;
+        }
+
+        .product-form {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .form-field.full {
+            grid-column: 1 / -1;
+        }
+
+        .form-field label {
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .form-field input,
+        .form-field select {
+            padding: 12px;
+            border: 1px solid #DED2C3;
+            border-radius: 8px;
+            background: white;
+            font: inherit;
+            font-size: 13px;
+            outline: none;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .form-field input:focus,
+        .form-field select:focus {
+            border-color: #98704E;
+            box-shadow: 0 0 0 3px rgba(152,112,78,.12);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 23px;
+        }
+
+        .secondary-btn {
+            background: #E8DED2;
+            color: #63452F;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 18px;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .form-message {
+            margin-top: 15px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        @media(max-width: 800px) {
+            .inventory-page {
+                padding: 18px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .inventory-card {
+                padding: 18px;
+            }
+        }
+
+        @media(max-width: 550px) {
+            .product-form {
+                grid-template-columns: 1fr;
+            }
+
+            .form-field.full {
+                grid-column: auto;
+            }
+
+            .inventory-heading h1 {
+                font-size: 28px;
+            }
+
+            .modal-content {
+                padding: 19px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <h1>SEDUH SENJA</h1>
+            <p>COFFEE INVENTORY SYSTEM</p>
+        </div>
+
+        <p class="menu-title">MENU UTAMA</p>
+
+        <nav class="nav-menu">
+
+            <a href="/" class="nav-link">
+                <span class="nav-icon">⌂</span>
+                Dashboard
+            </a>
+
+            <a href="/inventory" class="nav-link active">
+                <span class="nav-icon">▦</span>
+                Inventaris
+            </a>
+
+            <a href="/stock-in" class="nav-link">
+                <span class="nav-icon">↙</span>
+                Barang Masuk
+            </a>
+
+            <a href="/stock-out" class="nav-link">
+                <span class="nav-icon">↗</span>
+                Barang Keluar
+            </a>
+
+        </nav>
+
+        <p class="menu-title">LAINNYA</p>
+
+        <nav class="nav-menu">
+            <a href="#" class="nav-link">
+                <span class="nav-icon">♙</span>
+                Supplier
+            </a>
+
+            <a href="#" class="nav-link">
+                <span class="nav-icon">▤</span>
+                Laporan
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            SEDUH SENJA<br>
+            Inventory Management System<br>
+            Version 1.0.0
+        </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <div class="inventory-page">
+
+            <!-- HEADER -->
+            <header class="inventory-heading">
+
+                <div>
+                    <span class="eyebrow">INVENTORY MANAGEMENT</span>
+                    <h1>Manajemen Inventaris</h1>
+                    <p>Kelola seluruh persediaan bahan baku dan produk SEDUH SENJA.</p>
+                </div>
+
+                <button class="primary-btn" id="addProductBtn" type="button">
+                    + Tambah Produk
+                </button>
+
+            </header>
+
+            <!-- SUMMARY -->
+            <section class="summary-grid">
+
+                <div class="summary-card">
+                    <div class="summary-icon">📦</div>
+                    <span>Total Produk Aktif</span>
+                    <h2 id="totalProducts">0</h2>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-icon">☕</div>
+                    <span>Total Stok Produk</span>
+                    <h2 id="totalStock">0</h2>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-icon">⚠️</div>
+                    <span>Produk Stok Menipis</span>
+                    <h2 id="lowStockProducts">0</h2>
+                </div>
+
+            </section>
+
+            <!-- INVENTORY TABLE -->
+            <section class="inventory-card">
+
+                <div class="inventory-card-header">
+                    <h2>Daftar Inventaris</h2>
+                    <span id="productCount">0 produk</span>
+                </div>
+
+                <div class="toolbar">
+
+                    <input
+                        type="search"
+                        id="searchProduct"
+                        placeholder="Cari kode atau nama produk..."
+                    >
+
+                    <select id="filterStatus">
+                        <option value="all">Semua Status</option>
+                        <option value="safe">Stok Aman</option>
+                        <option value="low">Stok Menipis</option>
+                        <option value="empty">Stok Habis</option>
+                    </select>
+
+                </div>
+
+                <div class="table-wrap">
+
+                    <table class="inventory-table">
+
+                        <thead>
+                            <tr>
+                                <th>KODE</th>
+                                <th>NAMA PRODUK</th>
+                                <th>KATEGORI</th>
+                                <th>STOK</th>
+                                <th>STOK MINIMUM</th>
+                                <th>STATUS</th>
+                                <th>AKSI</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="productTable">
+
+                            <tr>
+                                <td colspan="7" class="empty-state">
+                                    Memuat data produk...
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <p class="connection-status" id="connectionStatus" role="status">
+                    Menghubungkan ke database...
+                </p>
+
+            </section>
+
+            <footer style="text-align:center;padding:20px 0">
+                <p class="connection-status">
+                    © 2026 SEDUH SENJA — Coffee Inventory Management System
+                </p>
+            </footer>
+
+        </div>
+
+    </main>
+
+</div>
+
+<!-- MODAL TAMBAH / EDIT PRODUK -->
+<div class="modal" id="productModal">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+            <h2 id="modalTitle">Tambah Produk Baru</h2>
+
+            <button
+                type="button"
+                class="close-modal"
+                id="closeModal"
+                aria-label="Tutup"
+            >
+                &times;
+            </button>
+        </div>
+
+        <form id="productForm">
+
+            <input type="hidden" id="productId">
+
+            <div class="product-form">
+
+                <div class="form-field">
+                    <label for="productCode">Kode Produk *</label>
+                    <input
+                        type="text"
+                        id="productCode"
+                        placeholder="Contoh: SS001"
+                        required
+                    >
+                </div>
+
+                <div class="form-field">
+                    <label for="productName">Nama Produk *</label>
+                    <input
+                        type="text"
+                        id="productName"
+                        placeholder="Contoh: Biji Kopi Arabika"
+                        required
+                    >
+                </div>
+
+                <div class="form-field">
+                    <label for="productCategory">Kategori *</label>
+                    <select id="productCategory" required>
+                        <option value="">Pilih kategori</option>
+                    </select>
+                </div>
+
+                <div class="form-field">
+                    <label for="productUnit">Satuan *</label>
+                    <select id="productUnit" required>
+                        <option value="">Pilih satuan</option>
+                        <option value="Pcs">Pcs</option>
+                        <option value="Kg">Kg</option>
+                        <option value="Gram">Gram</option>
+                        <option value="Liter">Liter</option>
+                        <option value="Ml">Ml</option>
+                        <option value="Pack">Pack</option>
+                        <option value="Box">Box</option>
+                        <option value="Botol">Botol</option>
+                    </select>
+                </div>
+
+                <div class="form-field">
+                    <label for="productStock">Stok Awal *</label>
+                    <input
+                        type="number"
+                        id="productStock"
+                        min="0"
+                        step="0.01"
+                        value="0"
+                        required
+                    >
+                </div>
+
+                <div class="form-field">
+                    <label for="productMinimum">Stok Minimum *</label>
+                    <input
+                        type="number"
+                        id="productMinimum"
+                        min="0"
+                        step="0.01"
+                        value="5"
+                        required
+                    >
+                </div>
+
+            </div>
+
+            <div class="modal-actions">
+
+                <button
+                    type="submit"
+                    class="primary-btn"
+                    id="saveProductBtn"
+                >
+                    Simpan Produk
+                </button>
+
+                <button
+                    type="button"
+                    class="secondary-btn"
+                    id="cancelModal"
+                >
+                    Batal
+                </button>
+
+            </div>
+
+            <p id="formMessage" class="form-message" role="status"></p>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script src="/js/inventory.js"></script>
+
+</body>
+</html>

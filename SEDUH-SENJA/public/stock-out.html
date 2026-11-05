@@ -1,0 +1,397 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#241A16">
+
+    <title>Barang Keluar | SEDUH SENJA</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        .out-page {
+            padding: 30px;
+            color: #F5EBDD;
+        }
+
+        .out-heading {
+            margin-bottom: 26px;
+        }
+
+        .out-heading .eyebrow {
+            color: #B58A62;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .out-heading h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 34px;
+            margin: 8px 0;
+        }
+
+        .out-heading p {
+            color: #B9AAA0;
+            font-size: 14px;
+        }
+
+        .out-card {
+            background: #F7F3ED;
+            color: #241A16;
+            border-radius: 16px;
+            padding: 26px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 25px rgba(0,0,0,.12);
+        }
+
+        .out-card h2 {
+            font-size: 19px;
+            margin: 0 0 22px;
+        }
+
+        .out-form {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .out-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .out-field.full {
+            grid-column: 1 / -1;
+        }
+
+        .out-field label {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .out-field input,
+        .out-field select,
+        .out-field textarea {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #DED2C3;
+            border-radius: 9px;
+            background: #FFFFFF;
+            color: #241A16;
+            font: inherit;
+            font-size: 14px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .out-field input:focus,
+        .out-field select:focus,
+        .out-field textarea:focus {
+            border-color: #98704E;
+            box-shadow: 0 0 0 3px rgba(152,112,78,.12);
+        }
+
+        .out-field textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        .out-stock-info {
+            background: #EDE5DA;
+            border-radius: 9px;
+            padding: 13px 15px;
+            color: #63452F;
+            font-size: 13px;
+            margin-top: 2px;
+        }
+
+        .out-stock-info strong {
+            font-size: 17px;
+        }
+
+        .out-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 22px;
+        }
+
+        .out-button {
+            border: none;
+            border-radius: 9px;
+            padding: 13px 20px;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .out-submit {
+            background: #6F4E37;
+            color: white;
+        }
+
+        .out-submit:hover {
+            background: #513825;
+        }
+
+        .out-submit:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+        }
+
+        .out-reset {
+            background: #E7DDD1;
+            color: #513825;
+        }
+
+        .out-message {
+            margin-top: 16px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .out-table-wrap {
+            overflow-x: auto;
+        }
+
+        .out-table {
+            width: 100%;
+            min-width: 720px;
+            border-collapse: collapse;
+        }
+
+        .out-table th,
+        .out-table td {
+            padding: 15px 12px;
+            text-align: left;
+            border-bottom: 1px solid #E6DDD2;
+            font-size: 13px;
+        }
+
+        .out-table th {
+            color: #806044;
+            font-size: 11px;
+            letter-spacing: .5px;
+        }
+
+        .out-table td {
+            color: #46372D;
+        }
+
+        .out-code {
+            font-weight: 700;
+            color: #805A3D !important;
+        }
+
+        .out-empty {
+            text-align: center !important;
+            padding: 30px !important;
+            color: #95877C !important;
+        }
+
+        .out-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            background: #F5E1D9;
+            color: #A64C36;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        @media(max-width: 768px) {
+            .out-page {
+                padding: 18px;
+            }
+
+            .out-form {
+                grid-template-columns: 1fr;
+            }
+
+            .out-field.full {
+                grid-column: auto;
+            }
+
+            .out-card {
+                padding: 19px;
+            }
+
+            .out-heading h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <h1>SEDUH SENJA</h1>
+            <p>COFFEE INVENTORY SYSTEM</p>
+        </div>
+
+        <p class="menu-title">MENU UTAMA</p>
+
+        <nav class="nav-menu">
+            <a href="/" class="nav-link">
+                <span class="nav-icon">⌂</span>
+                Dashboard
+            </a>
+
+            <a href="/inventory" class="nav-link">
+                <span class="nav-icon">▦</span>
+                Inventaris
+            </a>
+
+            <a href="/stock-in" class="nav-link">
+                <span class="nav-icon">↙</span>
+                Barang Masuk
+            </a>
+
+            <a href="/stock-out" class="nav-link active">
+                <span class="nav-icon">↗</span>
+                Barang Keluar
+            </a>
+        </nav>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <div class="out-page">
+
+            <header class="out-heading">
+                <span class="eyebrow">INVENTORY MANAGEMENT</span>
+                <h1>Barang Keluar</h1>
+                <p>Kelola dan catat setiap penggunaan bahan baku serta produk SEDUH SENJA.</p>
+            </header>
+
+            <!-- FORM BARANG KELUAR -->
+            <section class="out-card">
+
+                <h2>Tambah Transaksi Barang Keluar</h2>
+
+                <form id="stockOutForm">
+
+                    <div class="out-form">
+
+                        <div class="out-field full">
+                            <label for="productId">Pilih Produk *</label>
+
+                            <select id="productId" required>
+                                <option value="">Memuat produk...</option>
+                            </select>
+
+                            <div class="out-stock-info" id="stockInfo">
+                                Pilih produk untuk melihat stok tersedia.
+                            </div>
+                        </div>
+
+                        <div class="out-field">
+                            <label for="transactionDate">Tanggal Keluar *</label>
+                            <input type="date" id="transactionDate" required>
+                        </div>
+
+                        <div class="out-field">
+                            <label for="quantity">Jumlah Barang Keluar *</label>
+                            <input
+                                type="number"
+                                id="quantity"
+                                min="0.01"
+                                step="0.01"
+                                placeholder="Contoh: 5"
+                                required
+                            >
+                        </div>
+
+                        <div class="out-field full">
+                            <label for="notes">Keterangan / Catatan</label>
+                            <textarea
+                                id="notes"
+                                placeholder="Contoh: Penggunaan bahan baku untuk produksi kopi..."
+                            ></textarea>
+                        </div>
+
+                    </div>
+
+                    <div class="out-actions">
+                        <button
+                            type="submit"
+                            class="out-button out-submit"
+                            id="saveStockOut"
+                        >
+                            Simpan Barang Keluar
+                        </button>
+
+                        <button
+                            type="reset"
+                            class="out-button out-reset"
+                        >
+                            Reset
+                        </button>
+                    </div>
+
+                    <p id="stockOutMessage" class="out-message" role="status"></p>
+
+                </form>
+
+            </section>
+
+            <!-- RIWAYAT TRANSAKSI -->
+            <section class="out-card">
+
+                <h2>Riwayat Barang Keluar</h2>
+
+                <div class="out-table-wrap">
+
+                    <table class="out-table">
+
+                        <thead>
+                            <tr>
+                                <th>KODE TRANSAKSI</th>
+                                <th>TANGGAL</th>
+                                <th>KODE PRODUK</th>
+                                <th>NAMA PRODUK</th>
+                                <th>JUMLAH KELUAR</th>
+                                <th>KETERANGAN</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="stockOutTable">
+                            <tr>
+                                <td colspan="6" class="out-empty">
+                                    Memuat riwayat transaksi...
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script src="/js/stock-out.js"></script>
+
+</body>
+</html>

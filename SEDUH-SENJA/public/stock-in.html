@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Barang Masuk | SEDUH SENJA</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .stock-page { padding: 28px; }
+    .stock-heading { margin-bottom: 24px; }
+    .stock-heading h1 { margin: 0 0 8px; }
+    .stock-card {
+      background: var(--cream, #F7F5F0);
+      color: var(--dark, #241A16);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 18px rgba(0,0,0,.06);
+    }
+    .stock-form {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .stock-field { display: flex; flex-direction: column; gap: 7px; }
+    .stock-field.full { grid-column: 1 / -1; }
+    .stock-field label { font-weight: 600; font-size: 14px; }
+    .stock-field input, .stock-field select, .stock-field textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d7cabb;
+      border-radius: 8px;
+      background: white;
+      color: #241A16;
+      font: inherit;
+      box-sizing: border-box;
+    }
+    .stock-field textarea { min-height: 85px; resize: vertical; }
+    .stock-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .stock-button {
+      border: 0; border-radius: 8px; padding: 12px 18px;
+      cursor: pointer; font-weight: 600; font: inherit;
+    }
+    .stock-submit { background: #6F4E37; color: white; }
+    .stock-reset { background: #E9DFD0; color: #241A16; }
+    .stock-message { margin-top: 14px; font-size: 14px; }
+    .stock-table-wrap { overflow-x: auto; }
+    .stock-table { width: 100%; border-collapse: collapse; min-width: 750px; }
+    .stock-table th, .stock-table td {
+      padding: 13px; text-align: left; border-bottom: 1px solid #e5ddd3;
+    }
+    .stock-table th { font-size: 13px; color: #6F4E37; }
+    .stock-empty { text-align: center; padding: 25px; color: #777; }
+    @media(max-width:700px) {
+      .stock-page { padding: 16px; }
+      .stock-form { grid-template-columns: 1fr; }
+      .stock-field.full { grid-column: auto; }
+      .stock-card { padding: 17px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="logo">
+        <h2>SEDUH SENJA</h2>
+        <p>Coffee Inventory</p>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="/">Dashboard</a>
+        <a href="/inventory">Inventaris</a>
+        <a href="/stock-in" class="active">Barang Masuk</a>
+        <a href="/stock-out">Barang Keluar</a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <div class="stock-page">
+        <header class="stock-heading">
+          <p>INVENTORY MANAGEMENT</p>
+          <h1>Barang Masuk</h1>
+          <p>Catat setiap bahan dan produk yang masuk ke gudang SEDUH SENJA.</p>
+        </header>
+
+        <section class="stock-card">
+          <h2>Tambah Transaksi Barang Masuk</h2>
+
+          <form id="stockInForm">
+            <div class="stock-form">
+              <div class="stock-field">
+                <label for="productId">Nama Produk *</label>
+                <select id="productId" required>
+                  <option value="">Memuat produk...</option>
+                </select>
+              </div>
+
+              <div class="stock-field">
+                <label for="supplierId">Supplier</label>
+                <select id="supplierId">
+                  <option value="">Tanpa supplier</option>
+                </select>
+              </div>
+
+              <div class="stock-field">
+                <label for="transactionDate">Tanggal Masuk *</label>
+                <input type="date" id="transactionDate" required>
+              </div>
+
+              <div class="stock-field">
+                <label for="quantity">Jumlah Masuk *</label>
+                <input type="number" id="quantity" min="0.01" step="0.01"
+                  placeholder="Contoh: 10" required>
+              </div>
+
+              <div class="stock-field">
+                <label for="price">Harga Beli per Satuan (Rp)</label>
+                <input type="number" id="price" min="0" step="1"
+                  placeholder="Contoh: 120000">
+              </div>
+
+              <div class="stock-field full">
+                <label for="notes">Catatan</label>
+                <textarea id="notes" placeholder="Catatan tambahan transaksi..."></textarea>
+              </div>
+            </div>
+
+            <div class="stock-actions">
+              <button type="submit" class="stock-button stock-submit" id="saveStockIn">
+                Simpan Barang Masuk
+              </button>
+              <button type="reset" class="stock-button stock-reset">
+                Reset
+              </button>
+            </div>
+
+            <p id="stockInMessage" class="stock-message" role="status"></p>
+          </form>
+        </section>
+
+        <section class="stock-card">
+          <h2>Riwayat Barang Masuk</h2>
+          <div class="stock-table-wrap">
+            <table class="stock-table">
+              <thead>
+                <tr>
+                  <th>Kode Transaksi</th>
+                  <th>Tanggal</th>
+                  <th>Produk</th>
+                  <th>Supplier</th>
+                  <th>Jumlah</th>
+                  <th>Harga/Satuan</th>
+                  <th>Catatan</th>
+                </tr>
+              </thead>
+              <tbody id="stockInTable">
+                <tr><td colspan="7" class="stock-empty">Memuat data...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/stock-in.js"></script>
+</body>
+</html>
