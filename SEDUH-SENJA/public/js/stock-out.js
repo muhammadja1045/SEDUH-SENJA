@@ -1,4 +1,10 @@
 
+"use strict";
+
+// ==========================================
+// 1. ELEMENT HTML
+// ==========================================
+
 const form = document.getElementById("stockOutForm");
 const productSelect = document.getElementById("productId");
 const quantityInput = document.getElementById("quantity");
@@ -8,320 +14,493 @@ const tableBody = document.getElementById("stockOutTable");
 const message = document.getElementById("stockOutMessage");
 const saveButton = document.getElementById("saveStockOut");
 
+const notesInput = document.getElementById("notes");
+
 let products = [];
+let isLoading = false;
 
 // ==========================================
-// 1. TANGGAL HARI INI
+// 2. VALIDASI ELEMENT
 // ==========================================
 
-function getTodayDate() {
-    const today = new Date();
+if (
+    !form ||
+    !productSelect ||
+    !quantityInput ||
+    !dateInput ||
+    !stockInfo ||
+    !tableBody ||
+    !message ||
+    !saveButton ||
+    !notesInput
+) {
+    console.error(
+        "Elemen HTML Barang Keluar tidak lengkap. Periksa ID elemen."
+    );
+} else {
 
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, "0");
-    const day = String(today.getDate()).padStart(2, "0");
+    // ==========================================
+    // 3. TANGGAL HARI INI
+    // ==========================================
 
-    return `${year}-${month}-${day}`;
-}
+    function getTodayDate() {
+        const today = new Date();
 
-dateInput.value = getTodayDate();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, "0");
+        const day = String(today.getDate()).padStart(2, "0");
 
-// ==========================================
-// 2. ESCAPE HTML
-// ==========================================
+        return `${year}-${month}-${day}`;
+    }
 
-function escapeHTML(value) {
-    return String(value ?? "").replace(/[&<>"']/g, (char) => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#039;"
-    })[char]);
-}
+    dateInput.value = getTodayDate();
 
-// ==========================================
-// 3. FORMAT TANGGAL
-// ==========================================
+    // ==========================================
+    // 4. ESCAPE HTML
+    // ==========================================
 
-function formatDate(value) {
-    if (!value) return "-";
+    function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#039;"
+        })[char]);
+    }
 
-    const date = String(value).slice(0, 10);
-    const parts = date.split("-");
+    // ==========================================
+    // 5. FORMAT ANGKA
+    // ==========================================
 
-    if (parts.length !== 3) return escapeHTML(value);
+    function formatNumber(value) {
+        return new Intl.NumberFormat("id-ID", {
+            maximumFractionDigits: 2
+        }).format(Number(value) || 0);
+    }
 
-    return `${parts[2]}-${parts[1]}-${parts[0]}`;
-}
+    // ==========================================
+    // 6. FORMAT TANGGAL
+    // ==========================================
 
-// ==========================================
-// 4. FORMAT ANGKA
-// ==========================================
+    function formatDate(value) {
+        if (!value) return "-";
 
-function formatNumber(value) {
-    return new Intl.NumberFormat("id-ID", {
-        maximumFractionDigits: 2
-    }).format(Number(value) || 0);
-}
+        const date = String(value).slice(0, 10);
+        const parts = date.split("-");
 
-// ==========================================
-// 5. MEMUAT PRODUK
-// ==========================================
-
-async function loadProducts() {
-    try {
-        const response = await fetch("/api/products");
-        const result = await response.json();
-
-        if (!response.ok || !result.success) {
-            throw new Error(
-                result.message || "Gagal memuat produk."
-            );
+        if (parts.length !== 3) {
+            return escapeHTML(value);
         }
 
-        products = result.data || [];
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
 
-        productSelect.innerHTML =
-            '<option value="">Pilih produk</option>';
+    // ==========================================
+    // 7. MENAMPILKAN PESAN
+    // ==========================================
 
-        products.forEach((product) => {
-            const option = document.createElement("option");
+    function showMessage(text, type = "error") {
+        message.textContent = text;
 
-            option.value = product.id;
-            option.textContent =
-                `${product.code} - ${product.name}`;
+        message.style.color =
+            type === "success" ? "#287A48" : "#B84A3A";
+    }
 
-            productSelect.appendChild(option);
+    // ==========================================
+    // 8. REQUEST API
+    // ==========================================
+
+    async function apiRequest(url, options = {}) {
+        const response = await fetch(url, {
+            ...options,
+            headers: {
+                ...(options.body ? {
+                    "Content-Type": "application/json"
+                } : {}),
+                ...options.headers
+            }
         });
 
-        updateStockInfo();
+        let result;
 
-    } catch (error) {
-        console.error("Load products error:", error);
-
-        productSelect.innerHTML =
-            '<option value="">Gagal memuat produk</option>';
-
-        stockInfo.textContent = error.message;
-    }
-}
-
-// ==========================================
-// 6. INFORMASI STOK PRODUK
-// ==========================================
-
-function updateStockInfo() {
-    const productId = Number(productSelect.value);
-
-    const product = products.find(
-        (item) => Number(item.id) === productId
-    );
-
-    if (!product) {
-        stockInfo.innerHTML =
-            "Pilih produk untuk melihat stok tersedia.";
-
-        return;
-    }
-
-    const stock = Number(product.stock) || 0;
-    const unit = escapeHTML(product.unit);
-
-    stockInfo.innerHTML = `
-        Stok tersedia:
-        <strong>${formatNumber(stock)} ${unit}</strong>
-    `;
-
-    quantityInput.max = stock;
-
-    if (Number(quantityInput.value) > stock) {
-        quantityInput.setCustomValidity(
-            `Stok tersedia hanya ${stock} ${product.unit}.`
-        );
-    } else {
-        quantityInput.setCustomValidity("");
-    }
-}
-
-productSelect.addEventListener("change", updateStockInfo);
-
-quantityInput.addEventListener("input", updateStockInfo);
-
-// ==========================================
-// 7. MEMUAT RIWAYAT BARANG KELUAR
-// ==========================================
-
-async function loadStockOutHistory() {
-    try {
-        const response = await fetch("/api/stock-out");
-        const result = await response.json();
-
-        if (!response.ok || !result.success) {
+        try {
+            result = await response.json();
+        } catch {
             throw new Error(
-                result.message || "Gagal memuat riwayat."
+                "Server memberikan respons yang tidak valid."
             );
         }
 
-        const transactions = result.data || [];
+        if (!response.ok || result.success === false) {
+            throw new Error(
+                result.message || `Request gagal (${response.status}).`
+            );
+        }
 
-        if (transactions.length === 0) {
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="6" class="out-empty">
-                        Belum ada transaksi barang keluar.
-                    </td>
-                </tr>
-            `;
+        return result;
+    }
+
+    // ==========================================
+    // 9. MEMUAT DATA PRODUK
+    // ==========================================
+
+    async function loadProducts() {
+        try {
+            productSelect.innerHTML =
+                '<option value="">Memuat produk...</option>';
+
+            productSelect.disabled = true;
+
+            const result = await apiRequest("/api/products");
+
+            // Backend products.js mengirim result.products
+            products = Array.isArray(result.products)
+                ? result.products
+                : Array.isArray(result.data)
+                    ? result.data
+                    : [];
+
+            productSelect.innerHTML =
+                '<option value="">Pilih produk</option>';
+
+            if (products.length === 0) {
+                productSelect.innerHTML =
+                    '<option value="">Belum ada produk tersedia</option>';
+
+                stockInfo.textContent =
+                    "Belum ada produk aktif di Inventaris.";
+
+                return;
+            }
+
+            products.forEach((product) => {
+                const option = document.createElement("option");
+
+                const stock = Number(product.stock) || 0;
+                const unit = product.unit || "";
+
+                option.value = product.id;
+
+                option.textContent =
+                    `${product.code} - ${product.name} | Stok: ${formatNumber(stock)} ${unit}`;
+
+                // Produk dengan stok kosong tidak dapat dipilih
+                option.disabled = stock <= 0;
+
+                productSelect.appendChild(option);
+            });
+
+            productSelect.disabled = false;
+
+            updateStockInfo();
+
+        } catch (error) {
+            console.error("Load products error:", error);
+
+            products = [];
+
+            productSelect.innerHTML =
+                '<option value="">Gagal memuat produk</option>';
+
+            stockInfo.textContent = error.message;
+
+            showMessage(
+                "Gagal mengambil data Inventaris: " + error.message
+            );
+        }
+    }
+
+    // ==========================================
+    // 10. INFORMASI STOK PRODUK
+    // ==========================================
+
+    function updateStockInfo() {
+        const productId = Number(productSelect.value);
+
+        const product = products.find(
+            (item) => Number(item.id) === productId
+        );
+
+        if (!product) {
+            stockInfo.textContent =
+                "Pilih produk untuk melihat stok tersedia.";
+
+            quantityInput.removeAttribute("max");
+            quantityInput.setCustomValidity("");
 
             return;
         }
 
-        tableBody.innerHTML = transactions.map((item) => `
-            <tr>
-                <td class="out-code">
-                    ${escapeHTML(item.transaction_code)}
-                </td>
+        const stock = Number(product.stock) || 0;
+        const unit = escapeHTML(product.unit);
 
-                <td>
-                    ${formatDate(item.transaction_date)}
-                </td>
-
-                <td>
-                    ${escapeHTML(item.product_code)}
-                </td>
-
-                <td>
-                    ${escapeHTML(item.product_name)}
-                </td>
-
-                <td>
-                    <span class="out-badge">
-                        -${formatNumber(item.quantity)}
-                        ${escapeHTML(item.unit)}
-                    </span>
-                </td>
-
-                <td>
-                    ${escapeHTML(item.notes || "-")}
-                </td>
-            </tr>
-        `).join("");
-
-    } catch (error) {
-        console.error("Load stock-out error:", error);
-
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="6" class="out-empty">
-                    Gagal memuat riwayat transaksi.
-                </td>
-            </tr>
+        stockInfo.innerHTML = `
+            Stok tersedia:
+            <strong>${formatNumber(stock)} ${unit}</strong>
         `;
-    }
-}
 
-// ==========================================
-// 8. SIMPAN TRANSAKSI BARANG KELUAR
-// ==========================================
+        quantityInput.max = stock;
 
-form.addEventListener("submit", async (event) => {
-    event.preventDefault();
+        if (stock <= 0) {
+            stockInfo.innerHTML += `
+                <br><strong style="color:#B84A3A">
+                    Stok produk kosong!
+                </strong>
+            `;
 
-    message.textContent = "";
-
-    const productId = Number(productSelect.value);
-    const quantity = Number(quantityInput.value);
-
-    const product = products.find(
-        (item) => Number(item.id) === productId
-    );
-
-    if (!product) {
-        message.textContent = "Silakan pilih produk terlebih dahulu.";
-        message.style.color = "#B84A3A";
-        return;
-    }
-
-    if (!Number.isFinite(quantity) || quantity <= 0) {
-        message.textContent = "Jumlah barang harus lebih dari 0.";
-        message.style.color = "#B84A3A";
-        return;
-    }
-
-    if (quantity > Number(product.stock)) {
-        message.textContent =
-            `Stok tidak mencukupi. Stok tersedia: ${product.stock} ${product.unit}.`;
-
-        message.style.color = "#B84A3A";
-        return;
-    }
-
-    const payload = {
-        product_id: productId,
-        quantity: quantity,
-        transaction_date: dateInput.value,
-        notes: document.getElementById("notes").value.trim()
-    };
-
-    saveButton.disabled = true;
-    saveButton.textContent = "Menyimpan...";
-
-    try {
-        const response = await fetch("/api/stock-out", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(payload)
-        });
-
-        const result = await response.json();
-
-        if (!response.ok || !result.success) {
-            throw new Error(
-                result.message || "Transaksi gagal disimpan."
+            quantityInput.setCustomValidity(
+                "Produk tidak memiliki stok tersedia."
             );
+
+            return;
         }
 
-        message.textContent =
-            `${result.message} Sisa stok: ${formatNumber(result.remaining_stock)} ${result.unit}.`;
-
-        message.style.color = "#287A48";
-
-        form.reset();
-        dateInput.value = getTodayDate();
-
-        await loadProducts();
-        await loadStockOutHistory();
-
-    } catch (error) {
-        console.error("Save stock-out error:", error);
-
-        message.textContent = error.message;
-        message.style.color = "#B84A3A";
-
-    } finally {
-        saveButton.disabled = false;
-        saveButton.textContent = "Simpan Barang Keluar";
+        if (Number(quantityInput.value) > stock) {
+            quantityInput.setCustomValidity(
+                `Stok tersedia hanya ${stock} ${product.unit}.`
+            );
+        } else {
+            quantityInput.setCustomValidity("");
+        }
     }
-});
 
-// ==========================================
-// 9. RESET FORM
-// ==========================================
+    productSelect.addEventListener(
+        "change",
+        updateStockInfo
+    );
 
-form.addEventListener("reset", () => {
-    setTimeout(() => {
-        dateInput.value = getTodayDate();
-        message.textContent = "";
-        updateStockInfo();
-    }, 0);
-});
+    quantityInput.addEventListener(
+        "input",
+        updateStockInfo
+    );
 
-// ==========================================
-// 10. JALANKAN SAAT HALAMAN DIBUKA
-// ==========================================
+    // ==========================================
+    // 11. MEMUAT RIWAYAT BARANG KELUAR
+    // ==========================================
 
-loadProducts();
-loadStockOutHistory();
+    async function loadStockOutHistory() {
+        try {
+            const result = await apiRequest("/api/stock-out");
+
+            // Mendukung beberapa format respons backend
+            const transactions = Array.isArray(result.data)
+                ? result.data
+                : Array.isArray(result.transactions)
+                    ? result.transactions
+                    : Array.isArray(result.stockOut)
+                        ? result.stockOut
+                        : [];
+
+            if (transactions.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="out-empty">
+                            Belum ada transaksi barang keluar.
+                        </td>
+                    </tr>
+                `;
+
+                return;
+            }
+
+            tableBody.innerHTML = transactions.map((item) => `
+                <tr>
+                    <td class="out-code">
+                        ${escapeHTML(item.transaction_code)}
+                    </td>
+
+                    <td>
+                        ${formatDate(item.transaction_date)}
+                    </td>
+
+                    <td>
+                        ${escapeHTML(item.product_code)}
+                    </td>
+
+                    <td>
+                        ${escapeHTML(item.product_name)}
+                    </td>
+
+                    <td>
+                        <span class="out-badge">
+                            -${formatNumber(item.quantity)}
+                            ${escapeHTML(item.unit)}
+                        </span>
+                    </td>
+
+                    <td>
+                        ${escapeHTML(item.notes || "-")}
+                    </td>
+                </tr>
+            `).join("");
+
+        } catch (error) {
+            console.error("Load history error:", error);
+
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="out-empty">
+                        Gagal memuat riwayat transaksi.
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+    // ==========================================
+    // 12. SIMPAN TRANSAKSI BARANG KELUAR
+    // ==========================================
+
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        if (isLoading) return;
+
+        showMessage("");
+
+        const productId = Number(productSelect.value);
+        const quantity = Number(quantityInput.value);
+
+        const product = products.find(
+            (item) => Number(item.id) === productId
+        );
+
+        // Validasi produk
+        if (!product) {
+            showMessage(
+                "Silakan pilih produk terlebih dahulu."
+            );
+
+            productSelect.focus();
+            return;
+        }
+
+        // Validasi stok
+        const availableStock = Number(product.stock);
+
+        if (availableStock <= 0) {
+            showMessage(
+                "Produk ini tidak memiliki stok tersedia."
+            );
+
+            return;
+        }
+
+        // Validasi jumlah
+        if (!Number.isFinite(quantity) || quantity <= 0) {
+            showMessage(
+                "Jumlah barang harus lebih dari 0."
+            );
+
+            quantityInput.focus();
+            return;
+        }
+
+        if (quantity > availableStock) {
+            showMessage(
+                `Stok tidak mencukupi. Tersedia ${formatNumber(availableStock)} ${product.unit}.`
+            );
+
+            quantityInput.focus();
+            return;
+        }
+
+        // Validasi tanggal
+        if (!dateInput.value) {
+            showMessage("Tanggal transaksi wajib diisi.");
+            dateInput.focus();
+            return;
+        }
+
+        const payload = {
+            product_id: productId,
+            quantity: quantity,
+            transaction_date: dateInput.value,
+            notes: notesInput.value.trim()
+        };
+
+        isLoading = true;
+
+        saveButton.disabled = true;
+        saveButton.textContent = "Menyimpan...";
+
+        try {
+            const result = await apiRequest(
+                "/api/stock-out",
+                {
+                    method: "POST",
+                    body: JSON.stringify(payload)
+                }
+            );
+
+            const remainingStock =
+                result.remaining_stock !== undefined
+                    ? result.remaining_stock
+                    : availableStock - quantity;
+
+            const unit = result.unit || product.unit;
+
+            showMessage(
+                `${result.message || "Barang keluar berhasil disimpan."} Sisa stok: ${formatNumber(remainingStock)} ${unit}.`,
+                "success"
+            );
+
+            // Reset form
+            form.reset();
+
+            dateInput.value = getTodayDate();
+
+            // Perbarui data produk dan riwayat
+            await Promise.all([
+                loadProducts(),
+                loadStockOutHistory()
+            ]);
+
+        } catch (error) {
+            console.error("Save stock-out error:", error);
+
+            showMessage(error.message);
+
+            // Refresh stok terbaru jika transaksi gagal
+            await loadProducts();
+
+        } finally {
+            isLoading = false;
+
+            saveButton.disabled = false;
+            saveButton.textContent = "Simpan Barang Keluar";
+        }
+    });
+
+    // ==========================================
+    // 13. RESET FORM
+    // ==========================================
+
+    form.addEventListener("reset", () => {
+        setTimeout(() => {
+            dateInput.value = getTodayDate();
+
+            quantityInput.removeAttribute("max");
+            quantityInput.setCustomValidity("");
+
+            message.textContent = "";
+
+            updateStockInfo();
+        }, 0);
+    });
+
+    // ==========================================
+    // 14. INISIALISASI HALAMAN
+    // ==========================================
+
+    async function initializeStockOut() {
+        await Promise.all([
+            loadProducts(),
+            loadStockOutHistory()
+        ]);
+    }
+
+    initializeStockOut();
+
+}

@@ -4,6 +4,8 @@ let inventoryProducts = [];
 const modal = document.getElementById("productModal");
 const productForm = document.getElementById("productForm");
 
+const $ = id => document.getElementById(id);
+
 function escapeHTML(value) {
     return String(value ?? "").replace(/[&<>"']/g, char => ({
         "&": "&amp;",
@@ -14,74 +16,144 @@ function escapeHTML(value) {
     })[char]);
 }
 
-// Mengambil data produk dari database
+// ==========================================
+// 1. MENGAMBIL KATEGORI
+// ==========================================
+
+async function loadCategories() {
+    const select = $("productCategory");
+
+    select.innerHTML = '<option value="">Tanpa kategori</option>';
+    select.required = false;
+
+    try {
+        const response = await fetch("/api/categories");
+        const result = await response.json();
+
+        if (!response.ok || !result.success) return;
+
+        const categories = result.categories || [];
+
+        categories.forEach(category => {
+            const option = document.createElement("option");
+            option.value = category.id;
+            option.textContent = category.name;
+            select.appendChild(option);
+        });
+
+    } catch (error) {
+        console.warn("Kategori belum dapat dimuat:", error.message);
+    }
+}
+
+// ==========================================
+// 2. MENGAMBIL DATA PRODUK
+// ==========================================
+
 async function loadProducts() {
-    const table = document.getElementById("inventoryTable");
+    const table = $("productTable");
+
+    table.innerHTML = `
+        <tr>
+            <td colspan="7" class="empty-state">
+                Memuat data produk...
+            </td>
+        </tr>
+    `;
 
     try {
         const response = await fetch("/api/products");
         const result = await response.json();
 
         if (!response.ok || !result.success) {
-            throw new Error(result.message || "Gagal mengambil produk");
+            throw new Error(result.message || "Gagal mengambil produk.");
         }
 
-        inventoryProducts = result.products;
+        inventoryProducts = result.products || [];
 
-        document.getElementById("inventoryCount").textContent =
-            inventoryProducts.length;
+        // Total produk
+        $("totalProducts").textContent = inventoryProducts.length;
+        $("productCount").textContent =
+            inventoryProducts.length + " produk";
 
-        document.getElementById("inventoryLowStock").textContent =
-            inventoryProducts.filter(
-                p => Number(p.stock) <= Number(p.minimum_stock)
-            ).length;
+        // Total stok
+        const totalStock = inventoryProducts.reduce(
+            (total, product) => total + Number(product.stock || 0),
+            0
+        );
+
+        $("totalStock").textContent = totalStock.toLocaleString("id-ID");
+
+        // Stok menipis
+        const lowStock = inventoryProducts.filter(product =>
+            Number(product.stock) <= Number(product.minimum_stock)
+        );
+
+        $("lowStockProducts").textContent = lowStock.length;
 
         renderProducts();
 
-        document.getElementById("inventoryMessage").textContent =
+        $("connectionStatus").textContent =
             "Terhubung dengan database SEDUH SENJA.";
 
     } catch (error) {
-        console.error(error);
+        console.error("Load products:", error);
+
+        inventoryProducts = [];
 
         table.innerHTML = `
             <tr>
                 <td colspan="7" class="empty-state">
-                    Gagal memuat data. Periksa server dan database.
+                    Gagal memuat data produk.
+                    <br>${escapeHTML(error.message)}
                 </td>
             </tr>
         `;
 
-        document.getElementById("inventoryMessage").textContent =
-            error.message;
+        $("connectionStatus").textContent =
+            "Gagal terhubung ke database.";
     }
 }
 
-// Menampilkan produk
-function renderProducts() {
-    const search = document
-        .getElementById("searchProduct")
-        .value.toLowerCase();
+// ==========================================
+// 3. MENAMPILKAN PRODUK
+// ==========================================
 
-    const filter = document.getElementById("filterStock").value;
+function renderProducts() {
+    const search = $("searchProduct").value
+        .trim()
+        .toLowerCase();
+
+    const filter = $("filterStatus").value;
 
     const filtered = inventoryProducts.filter(product => {
-        const matchesSearch =
-            product.name.toLowerCase().includes(search) ||
-            product.code.toLowerCase().includes(search);
+        const name = String(product.name || "").toLowerCase();
+        const code = String(product.code || "").toLowerCase();
 
-        const isLow =
-            Number(product.stock) <= Number(product.minimum_stock);
+        const matchesSearch =
+            name.includes(search) || code.includes(search);
+
+        const stock = Number(product.stock || 0);
+        const minimum = Number(product.minimum_stock || 0);
+
+        let status = "safe";
+
+        if (stock <= 0) {
+            status = "empty";
+        } else if (stock <= minimum) {
+            status = "low";
+        }
 
         const matchesFilter =
-            filter === "all" ||
-            (filter === "low" && isLow) ||
-            (filter === "available" && !isLow);
+            filter === "all" || filter === status;
 
         return matchesSearch && matchesFilter;
     });
 
-    const table = document.getElementById("inventoryTable");
+    const table = $("productTable");
+
+    $("productCount").textContent =
+        filtered.length + " produk";
 
     if (filtered.length === 0) {
         table.innerHTML = `
@@ -95,38 +167,63 @@ function renderProducts() {
     }
 
     table.innerHTML = filtered.map(product => {
-        const isLow =
-            Number(product.stock) <= Number(product.minimum_stock);
+        const stock = Number(product.stock || 0);
+        const minimum = Number(product.minimum_stock || 0);
+
+        let statusText = "Stok Aman";
+        let statusClass = "status-safe";
+
+        if (stock <= 0) {
+            statusText = "Stok Habis";
+            statusClass = "status-empty";
+        } else if (stock <= minimum) {
+            statusText = "Stok Menipis";
+            statusClass = "status-low";
+        }
 
         return `
             <tr>
-                <td>${escapeHTML(product.code)}</td>
-                <td>${escapeHTML(product.name)}</td>
-                <td>${escapeHTML(product.category || "-")}</td>
+                <td class="product-code">
+                    ${escapeHTML(product.code)}
+                </td>
+
+                <td class="product-name">
+                    ${escapeHTML(product.name)}
+                </td>
+
                 <td>
-                    ${Number(product.stock)}
+                    ${escapeHTML(product.category || "-")}
+                </td>
+
+                <td>
+                    ${stock.toLocaleString("id-ID")}
                     ${escapeHTML(product.unit)}
                 </td>
+
                 <td>
-                    ${Number(product.minimum_stock)}
+                    ${minimum.toLocaleString("id-ID")}
                     ${escapeHTML(product.unit)}
                 </td>
+
                 <td>
-                    <span class="${isLow ? "low-badge" : "available-badge"}">
-                        ${isLow ? "Stok menipis" : "Tersedia"}
+                    <span class="status-badge ${statusClass}">
+                        ${statusText}
                     </span>
                 </td>
+
                 <td>
-                    <div class="action-buttons">
+                    <div class="action-group">
                         <button
-                            class="action-button edit-button"
-                            onclick="editProduct(${product.id})">
+                            type="button"
+                            class="action-btn edit-btn"
+                            onclick="editProduct(${Number(product.id)})">
                             Edit
                         </button>
 
                         <button
-                            class="action-button archive-button"
-                            onclick="archiveProduct(${product.id})">
+                            type="button"
+                            class="action-btn archive-btn"
+                            onclick="archiveProduct(${Number(product.id)})">
                             Arsip
                         </button>
                     </div>
@@ -136,82 +233,114 @@ function renderProducts() {
     }).join("");
 }
 
-// Membuka form tambah
+// ==========================================
+// 4. MEMBUKA FORM TAMBAH PRODUK
+// ==========================================
+
 function openProductForm() {
     productForm.reset();
 
-    document.getElementById("productId").value = "";
-    document.getElementById("formTitle").textContent = "Tambah Produk";
-    document.getElementById("saveButton").textContent = "Simpan Produk";
-    document.getElementById("initialStockGroup").style.display = "flex";
-    document.getElementById("initialStock").disabled = false;
-    document.getElementById("formMessage").textContent = "";
+    $("productId").value = "";
+
+    $("modalTitle").textContent = "Tambah Produk Baru";
+    $("saveProductBtn").textContent = "Simpan Produk";
+
+    $("productStock").disabled = false;
+    $("productStock").value = 0;
+
+    $("productMinimum").value = 5;
+
+    $("formMessage").textContent = "";
+
+    $("formMessage").style.color = "";
 
     modal.classList.add("show");
 }
 
-// Menutup form
+// ==========================================
+// 5. MENUTUP FORM
+// ==========================================
+
 function closeProductForm() {
     modal.classList.remove("show");
 }
 
-// Mengedit produk
+// ==========================================
+// 6. EDIT PRODUK
+// ==========================================
+
 function editProduct(id) {
-    const product = inventoryProducts.find(p => p.id === id);
+    const product = inventoryProducts.find(
+        p => Number(p.id) === Number(id)
+    );
 
-    if (!product) return;
+    if (!product) {
+        alert("Produk tidak ditemukan.");
+        return;
+    }
 
-    document.getElementById("productId").value = product.id;
-    document.getElementById("code").value = product.code;
-    document.getElementById("name").value = product.name;
-    document.getElementById("categoryId").value =
+    $("productId").value = product.id;
+
+    $("productCode").value = product.code || "";
+    $("productName").value = product.name || "";
+
+    $("productCategory").value =
         product.category_id || "";
-    document.getElementById("unit").value = product.unit;
-    document.getElementById("initialStock").value = product.initial_stock;
-    document.getElementById("minimumStock").value = product.minimum_stock;
-    document.getElementById("purchasePrice").value = product.purchase_price;
-    document.getElementById("description").value =
-        product.description || "";
 
-    document.getElementById("formTitle").textContent = "Edit Produk";
-    document.getElementById("saveButton").textContent = "Simpan Perubahan";
-    document.getElementById("initialStockGroup").style.display = "none";
-    document.getElementById("formMessage").textContent = "";
+    $("productUnit").value = product.unit || "";
+
+    $("productStock").value = product.stock || 0;
+    $("productMinimum").value = product.minimum_stock || 0;
+
+    $("modalTitle").textContent = "Edit Produk";
+    $("saveProductBtn").textContent = "Simpan Perubahan";
+
+    // Stok tidak diedit melalui form ini.
+    $("productStock").disabled = true;
+
+    $("formMessage").textContent = "";
 
     modal.classList.add("show");
 }
 
-// Menyimpan produk baru atau perubahan
-productForm.addEventListener("submit", async event => {
+// ==========================================
+// 7. MENYIMPAN PRODUK
+// ==========================================
+
+productForm.addEventListener("submit", async function(event) {
     event.preventDefault();
 
-    const id = document.getElementById("productId").value;
+    const id = $("productId").value;
 
     const payload = {
-        code: document.getElementById("code").value.trim(),
-        name: document.getElementById("name").value.trim(),
-        category_id: document.getElementById("categoryId").value || null,
-        unit: document.getElementById("unit").value,
-        initial_stock: document.getElementById("initialStock").value,
-        minimum_stock: document.getElementById("minimumStock").value,
-        purchase_price: document.getElementById("purchasePrice").value,
-        description: document.getElementById("description").value
+        code: $("productCode").value.trim(),
+        name: $("productName").value.trim(),
+        category_id: $("productCategory").value || null,
+        unit: $("productUnit").value,
+        initial_stock: $("productStock").value,
+        minimum_stock: $("productMinimum").value,
+        purchase_price: 0,
+        description: ""
     };
 
-    const message = document.getElementById("formMessage");
-    const button = document.getElementById("saveButton");
+    const button = $("saveProductBtn");
+    const message = $("formMessage");
 
     button.disabled = true;
     button.textContent = "Menyimpan...";
+
+    message.textContent = "";
 
     try {
         const response = await fetch(
             id ? `/api/products/${id}` : "/api/products",
             {
                 method: id ? "PUT" : "POST",
+
                 headers: {
                     "Content-Type": "application/json"
                 },
+
                 body: JSON.stringify(payload)
             }
         );
@@ -219,42 +348,69 @@ productForm.addEventListener("submit", async event => {
         const result = await response.json();
 
         if (!response.ok || !result.success) {
-            throw new Error(result.message || "Gagal menyimpan produk");
+            throw new Error(
+                result.message || "Gagal menyimpan produk."
+            );
         }
 
+        message.style.color = "#287A48";
+        message.textContent = result.message;
+
+        alert(result.message);
+
         closeProductForm();
+
         await loadProducts();
 
     } catch (error) {
+        console.error("Save product:", error);
+
+        message.style.color = "#B84A3A";
         message.textContent = error.message;
+
     } finally {
         button.disabled = false;
-        button.textContent = id ? "Simpan Perubahan" : "Simpan Produk";
+
+        button.textContent = id
+            ? "Simpan Perubahan"
+            : "Simpan Produk";
     }
 });
 
-// Mengarsipkan produk
+// ==========================================
+// 8. MENGARSIPKAN PRODUK
+// ==========================================
+
 async function archiveProduct(id) {
-    const product = inventoryProducts.find(p => p.id === id);
+    const product = inventoryProducts.find(
+        p => Number(p.id) === Number(id)
+    );
 
     if (!product) return;
 
     const confirmed = confirm(
-        `Arsipkan produk "${product.name}"? Produk tidak akan tampil di inventaris aktif, tetapi riwayat transaksinya tetap disimpan.`
+        `Apakah kamu yakin ingin mengarsipkan ${product.name}?`
     );
 
     if (!confirmed) return;
 
     try {
-        const response = await fetch(`/api/products/${id}/archive`, {
-            method: "PATCH"
-        });
+        const response = await fetch(
+            `/api/products/${id}/archive`,
+            {
+                method: "PATCH"
+            }
+        );
 
         const result = await response.json();
 
         if (!response.ok || !result.success) {
-            throw new Error(result.message || "Gagal mengarsipkan produk");
+            throw new Error(
+                result.message || "Gagal mengarsipkan produk."
+            );
         }
+
+        alert(result.message);
 
         await loadProducts();
 
@@ -263,12 +419,61 @@ async function archiveProduct(id) {
     }
 }
 
-// Pencarian dan filter
-document.getElementById("searchProduct")
-    .addEventListener("input", renderProducts);
+// ==========================================
+// 9. EVENT TOMBOL
+// ==========================================
 
-document.getElementById("filterStock")
-    .addEventListener("change", renderProducts);
+// Tombol tambah
+$("addProductBtn").addEventListener(
+    "click",
+    openProductForm
+);
 
-// Memuat produk ketika halaman dibuka
-loadProducts();
+// Tombol tutup
+$("closeModal").addEventListener(
+    "click",
+    closeProductForm
+);
+
+// Tombol batal
+$("cancelModal").addEventListener(
+    "click",
+    closeProductForm
+);
+
+// Klik area luar modal
+modal.addEventListener("click", event => {
+    if (event.target === modal) {
+        closeProductForm();
+    }
+});
+
+// Tombol Escape
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+        closeProductForm();
+    }
+});
+
+// Pencarian
+$("searchProduct").addEventListener(
+    "input",
+    renderProducts
+);
+
+// Filter status
+$("filterStatus").addEventListener(
+    "change",
+    renderProducts
+);
+
+// ==========================================
+// 10. INISIALISASI
+// ==========================================
+
+async function initializeInventory() {
+    await loadCategories();
+    await loadProducts();
+}
+
+initializeInventory();
