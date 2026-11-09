@@ -1,23 +1,32 @@
-
 const express = require("express");
 const router = express.Router();
 const db = require("../config/database");
 
-// GET: Menampilkan semua supplier
+// ==========================================
+// 1. GET - MENAMPILKAN SEMUA SUPPLIER
+// ==========================================
+
 router.get("/", (req, res) => {
     try {
         const suppliers = db.prepare(`
-            SELECT id, name, phone, address, created_at
+            SELECT
+                id,
+                name,
+                phone,
+                address,
+                created_at
             FROM suppliers
-            ORDER BY name ASC
+            ORDER BY name COLLATE NOCASE ASC
         `).all();
 
         res.json({
             success: true,
             data: suppliers
         });
+
     } catch (error) {
-        console.error("Get suppliers error:", error);
+        console.error("[SUPPLIER GET]", error);
+
         res.status(500).json({
             success: false,
             message: "Gagal mengambil data supplier."
@@ -25,12 +34,15 @@ router.get("/", (req, res) => {
     }
 });
 
-// POST: Menambahkan supplier
+// ==========================================
+// 2. POST - TAMBAH SUPPLIER
+// ==========================================
+
 router.post("/", (req, res) => {
     try {
         const { name, phone, address } = req.body;
 
-        if (!name || !name.trim()) {
+        if (typeof name !== "string" || !name.trim()) {
             return res.status(400).json({
                 success: false,
                 message: "Nama supplier wajib diisi."
@@ -38,12 +50,20 @@ router.post("/", (req, res) => {
         }
 
         const result = db.prepare(`
-            INSERT INTO suppliers (name, phone, address)
+            INSERT INTO suppliers (
+                name,
+                phone,
+                address
+            )
             VALUES (?, ?, ?)
         `).run(
             name.trim(),
-            phone || null,
-            address || null
+            typeof phone === "string" && phone.trim()
+                ? phone.trim()
+                : null,
+            typeof address === "string" && address.trim()
+                ? address.trim()
+                : null
         );
 
         res.status(201).json({
@@ -53,7 +73,8 @@ router.post("/", (req, res) => {
         });
 
     } catch (error) {
-        console.error("Add supplier error:", error);
+        console.error("[SUPPLIER POST]", error);
+
         res.status(500).json({
             success: false,
             message: "Gagal menambahkan supplier."
@@ -61,11 +82,14 @@ router.post("/", (req, res) => {
     }
 });
 
-// PUT: Mengedit supplier
+// ==========================================
+// 3. PUT - EDIT SUPPLIER
+// ==========================================
+
 router.put("/:id", (req, res) => {
     try {
-        const { name, phone, address } = req.body;
         const id = Number(req.params.id);
+        const { name, phone, address } = req.body;
 
         if (!Number.isInteger(id) || id <= 0) {
             return res.status(400).json({
@@ -74,7 +98,7 @@ router.put("/:id", (req, res) => {
             });
         }
 
-        if (!name || !name.trim()) {
+        if (typeof name !== "string" || !name.trim()) {
             return res.status(400).json({
                 success: false,
                 message: "Nama supplier wajib diisi."
@@ -83,12 +107,19 @@ router.put("/:id", (req, res) => {
 
         const result = db.prepare(`
             UPDATE suppliers
-            SET name = ?, phone = ?, address = ?
+            SET
+                name = ?,
+                phone = ?,
+                address = ?
             WHERE id = ?
         `).run(
             name.trim(),
-            phone || null,
-            address || null,
+            typeof phone === "string" && phone.trim()
+                ? phone.trim()
+                : null,
+            typeof address === "string" && address.trim()
+                ? address.trim()
+                : null,
             id
         );
 
@@ -105,10 +136,60 @@ router.put("/:id", (req, res) => {
         });
 
     } catch (error) {
-        console.error("Update supplier error:", error);
+        console.error("[SUPPLIER PUT]", error);
+
         res.status(500).json({
             success: false,
             message: "Gagal memperbarui supplier."
+        });
+    }
+});
+
+// ==========================================
+// 4. DELETE - HAPUS SUPPLIER
+// ==========================================
+
+router.delete("/:id", (req, res) => {
+    try {
+        const id = Number(req.params.id);
+
+        if (!Number.isInteger(id) || id <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "ID supplier tidak valid."
+            });
+        }
+
+        const result = db.prepare(`
+            DELETE FROM suppliers
+            WHERE id = ?
+        `).run(id);
+
+        if (result.changes === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Supplier tidak ditemukan."
+            });
+        }
+
+        res.json({
+            success: true,
+            message: "Supplier berhasil dihapus."
+        });
+
+    } catch (error) {
+        console.error("[SUPPLIER DELETE]", error);
+
+        if (error.code === "SQLITE_CONSTRAINT_FOREIGNKEY") {
+            return res.status(409).json({
+                success: false,
+                message: "Supplier tidak dapat dihapus karena masih digunakan dalam transaksi."
+            });
+        }
+
+        res.status(500).json({
+            success: false,
+            message: "Gagal menghapus supplier."
         });
     }
 });

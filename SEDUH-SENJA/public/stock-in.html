@@ -1,168 +1,857 @@
+
 <!DOCTYPE html>
 <html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Barang Masuk | SEDUH SENJA</title>
-  <link rel="stylesheet" href="/css/style.css">
-  <style>
-    .stock-page { padding: 28px; }
-    .stock-heading { margin-bottom: 24px; }
-    .stock-heading h1 { margin: 0 0 8px; }
-    .stock-card {
-      background: var(--cream, #F7F5F0);
-      color: var(--dark, #241A16);
-      border-radius: 14px;
-      padding: 24px;
-      margin-bottom: 24px;
-      box-shadow: 0 4px 18px rgba(0,0,0,.06);
-    }
-    .stock-form {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
-    }
-    .stock-field { display: flex; flex-direction: column; gap: 7px; }
-    .stock-field.full { grid-column: 1 / -1; }
-    .stock-field label { font-weight: 600; font-size: 14px; }
-    .stock-field input, .stock-field select, .stock-field textarea {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #d7cabb;
-      border-radius: 8px;
-      background: white;
-      color: #241A16;
-      font: inherit;
-      box-sizing: border-box;
-    }
-    .stock-field textarea { min-height: 85px; resize: vertical; }
-    .stock-actions { display: flex; gap: 10px; margin-top: 20px; }
-    .stock-button {
-      border: 0; border-radius: 8px; padding: 12px 18px;
-      cursor: pointer; font-weight: 600; font: inherit;
-    }
-    .stock-submit { background: #6F4E37; color: white; }
-    .stock-reset { background: #E9DFD0; color: #241A16; }
-    .stock-message { margin-top: 14px; font-size: 14px; }
-    .stock-table-wrap { overflow-x: auto; }
-    .stock-table { width: 100%; border-collapse: collapse; min-width: 750px; }
-    .stock-table th, .stock-table td {
-      padding: 13px; text-align: left; border-bottom: 1px solid #e5ddd3;
-    }
-    .stock-table th { font-size: 13px; color: #6F4E37; }
-    .stock-empty { text-align: center; padding: 25px; color: #777; }
-    @media(max-width:700px) {
-      .stock-page { padding: 16px; }
-      .stock-form { grid-template-columns: 1fr; }
-      .stock-field.full { grid-column: auto; }
-      .stock-card { padding: 17px; }
-    }
-  </style>
-</head>
-<body>
-  <div class="app-container">
-    <aside class="sidebar">
-      <div class="logo">
-        <h2>SEDUH SENJA</h2>
-        <p>Coffee Inventory</p>
-      </div>
 
-      <nav class="sidebar-nav">
-        <a href="/">Dashboard</a>
-        <a href="/inventory">Inventaris</a>
-        <a href="/stock-in" class="active">Barang Masuk</a>
-        <a href="/stock-out">Barang Keluar</a>
-      </nav>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Barang Masuk | SEDUH SENJA</title>
+
+    <!-- MAIN CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+
+    <!-- GOOGLE FONTS -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+
+        /* ==========================================
+           STOCK IN PAGE
+        ========================================== */
+
+        :root {
+            --stock-brown: #6F4E37;
+            --stock-dark: #241A16;
+            --stock-cream: #F7F5F0;
+            --stock-beige: #E9DFD0;
+            --stock-text: #332821;
+            --stock-muted: #8B8178;
+            --stock-border: #EAE4DC;
+            --stock-green: #287A4C;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--stock-cream);
+            color: var(--stock-text);
+            margin: 0;
+        }
+
+        /* ==========================================
+           APP LAYOUT
+        ========================================== */
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .main-content {
+            flex: 1;
+            min-width: 0;
+            padding: 32px 38px;
+        }
+
+        /* ==========================================
+           SIDEBAR
+        ========================================== */
+
+        .sidebar {
+            width: 250px;
+            min-width: 250px;
+            min-height: 100vh;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            overflow-y: auto;
+
+            background: var(--stock-dark);
+            color: white;
+
+            padding: 28px 18px;
+
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            padding: 0 12px 25px;
+            border-bottom: 1px solid #49382E;
+        }
+
+        .brand h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 27px;
+            letter-spacing: 1px;
+            color: var(--stock-cream);
+            margin: 0;
+        }
+
+        .brand p {
+            font-size: 9px;
+            letter-spacing: 2px;
+            color: #B9A99A;
+            margin-top: 5px;
+        }
+
+        .sidebar-menu {
+            flex: 1;
+        }
+
+        .menu-title {
+            color: #9E8D7F;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            padding: 25px 12px 12px;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .nav-link {
+            text-decoration: none !important;
+            color: #C8BCAF !important;
+
+            padding: 12px;
+            border-radius: 8px;
+
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            font-size: 13px;
+            font-weight: 500;
+
+            transition: all .2s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: var(--stock-brown);
+            color: white !important;
+        }
+
+        .nav-icon {
+            width: 20px;
+            min-width: 20px;
+            text-align: center;
+            font-size: 17px;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 18px 12px 0;
+            border-top: 1px solid #49382E;
+            color: #B9A99A;
+            font-size: 11px;
+            line-height: 1.8;
+        }
+
+        /* ==========================================
+           PAGE HEADER
+        ========================================== */
+
+        .stock-heading {
+            margin-bottom: 28px;
+        }
+
+        .stock-label {
+            color: #B98255;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 3px;
+        }
+
+        .stock-heading h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 36px;
+            font-weight: 400;
+            color: var(--stock-dark);
+            margin: 9px 0;
+        }
+
+        .stock-heading p {
+            color: var(--stock-muted);
+            font-size: 13px;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        /* ==========================================
+           CONTENT CARD
+        ========================================== */
+
+        .stock-card {
+            background: white;
+            border: 1px solid var(--stock-border);
+            border-radius: 15px;
+            padding: 27px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 22px rgba(40,25,15,.05);
+            min-width: 0;
+        }
+
+        .stock-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stock-card-header h2 {
+            color: var(--stock-dark);
+            font-size: 19px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .stock-card-header p {
+            color: var(--stock-muted);
+            font-size: 11px;
+            margin: 7px 0 0;
+        }
+
+        .stock-card-icon {
+            width: 43px;
+            height: 43px;
+            border-radius: 11px;
+            background: #F1E8DF;
+            display: grid;
+            place-items: center;
+            font-size: 21px;
+            flex-shrink: 0;
+        }
+
+        /* ==========================================
+           FORM
+        ========================================== */
+
+        .stock-form {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 19px;
+        }
+
+        .stock-field {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            min-width: 0;
+        }
+
+        .stock-field.full {
+            grid-column: 1 / -1;
+        }
+
+        .stock-field label {
+            color: #594333;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .stock-field input,
+        .stock-field select,
+        .stock-field textarea {
+            width: 100%;
+            min-height: 47px;
+            padding: 12px 14px;
+
+            border: 1px solid #DFD1C2;
+            border-radius: 9px;
+
+            background: #fff;
+            color: var(--stock-text);
+
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+
+            outline: none;
+            transition: .2s;
+        }
+
+        .stock-field input:focus,
+        .stock-field select:focus,
+        .stock-field textarea:focus {
+            border-color: #B98255;
+            box-shadow: 0 0 0 3px rgba(185,130,85,.12);
+        }
+
+        .stock-field textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .stock-field input::placeholder,
+        .stock-field textarea::placeholder {
+            color: #A69A8F;
+        }
+
+        /* ==========================================
+           BUTTONS
+        ========================================== */
+
+        .stock-actions {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            margin-top: 22px;
+            flex-wrap: wrap;
+        }
+
+        .stock-button {
+            border: none;
+            border-radius: 9px;
+            padding: 13px 19px;
+
+            cursor: pointer;
+
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+
+            transition: all .2s ease;
+        }
+
+        .stock-submit {
+            background: var(--stock-brown);
+            color: white;
+        }
+
+        .stock-submit:hover {
+            background: #553A29;
+            transform: translateY(-2px);
+        }
+
+        .stock-reset {
+            background: var(--stock-beige);
+            color: var(--stock-dark);
+        }
+
+        .stock-reset:hover {
+            background: #DCD0BF;
+        }
+
+        .stock-button:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .stock-message {
+            margin-top: 15px;
+            font-size: 12px;
+            min-height: 18px;
+            line-height: 1.6;
+        }
+
+        /* ==========================================
+           TRANSACTION TABLE
+        ========================================== */
+
+        .stock-table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 9px;
+        }
+
+        .stock-table {
+            width: 100%;
+            min-width: 750px;
+            border-collapse: collapse;
+        }
+
+        .stock-table th {
+            background: #F5F0E9;
+            color: var(--stock-brown);
+            font-size: 11px;
+            font-weight: 700;
+            text-align: left;
+            padding: 15px 13px;
+            white-space: nowrap;
+        }
+
+        .stock-table td {
+            color: var(--stock-text);
+            font-size: 12px;
+            padding: 15px 13px;
+            border-bottom: 1px solid var(--stock-border);
+        }
+
+        .stock-table tbody tr:hover {
+            background: #FAF7F2;
+        }
+
+        .stock-empty {
+            text-align: center;
+            padding: 30px !important;
+            color: var(--stock-muted) !important;
+        }
+
+        /* ==========================================
+           RESPONSIVE
+        ========================================== */
+
+        @media(max-width: 1050px) {
+            .main-content {
+                padding: 25px 22px;
+            }
+        }
+
+        @media(max-width: 760px) {
+
+            .app-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                min-width: 0;
+                min-height: auto;
+                height: auto;
+                position: relative;
+                padding: 15px;
+            }
+
+            .brand {
+                padding: 0 5px 15px;
+            }
+
+            .menu-title {
+                padding: 15px 5px 8px;
+            }
+
+            .nav-menu {
+                flex-direction: row;
+                overflow-x: auto;
+            }
+
+            .nav-link {
+                white-space: nowrap;
+                font-size: 11px;
+                padding: 10px;
+            }
+
+            .sidebar-footer {
+                display: none;
+            }
+
+            .main-content {
+                padding: 22px 15px;
+            }
+
+            .stock-heading h1 {
+                font-size: 30px;
+            }
+
+            .stock-card {
+                padding: 19px;
+            }
+        }
+
+        @media(max-width: 500px) {
+
+            .stock-form {
+                grid-template-columns: 1fr;
+            }
+
+            .stock-field.full {
+                grid-column: auto;
+            }
+
+            .stock-actions {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .stock-button {
+                padding: 13px 8px;
+            }
+
+            .stock-card-header h2 {
+                font-size: 16px;
+            }
+        }
+
+        /* ==========================================
+           PRINT
+        ========================================== */
+
+        @media print {
+
+            .sidebar,
+            .stock-form,
+            .stock-actions,
+            .stock-message {
+                display: none !important;
+            }
+
+            .app-container {
+                display: block;
+            }
+
+            .main-content {
+                padding: 0;
+            }
+
+            .stock-card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="app-container">
+
+    <!-- ======================================
+         SIDEBAR
+    ======================================= -->
+
+    <aside class="sidebar">
+
+        <a href="/" class="sidebar-brand" aria-label="SEDUH SENJA">
+    <img
+        src="/images/logo-seduh-senja.png"
+        alt="Logo SEDUH SENJA"
+    >
+</a>
+
+        <div class="sidebar-menu">
+
+            <p class="menu-title">MENU UTAMA</p>
+
+            <nav class="nav-menu">
+
+                <a href="/" class="nav-link">
+                    <span class="nav-icon">⌂</span>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="/inventory" class="nav-link">
+                    <span class="nav-icon">▦</span>
+                    <span>Inventaris</span>
+                </a>
+
+                <a href="/stock-in" class="nav-link active">
+                    <span class="nav-icon">↙</span>
+                    <span>Barang Masuk</span>
+                </a>
+
+                <a href="/stock-out" class="nav-link">
+                    <span class="nav-icon">↗</span>
+                    <span>Barang Keluar</span>
+                </a>
+
+            </nav>
+
+            <p class="menu-title">LAINNYA</p>
+
+            <nav class="nav-menu">
+
+                <a href="#" class="nav-link">
+                    <span class="nav-icon">♙</span>
+                    <span>Supplier</span>
+                </a>
+
+                <a href="/reports" class="nav-link">
+                    <span class="nav-icon">▤</span>
+                    <span>Laporan</span>
+                </a>
+
+            </nav>
+
+        </div>
+
+        <div class="sidebar-footer">
+            <strong>SEDUH SENJA</strong>
+            <br>
+            Coffee Inventory System
+            <br>
+            © 2026 All Rights Reserved
+        </div>
+
     </aside>
 
+
+    <!-- ======================================
+         MAIN CONTENT
+    ======================================= -->
+
     <main class="main-content">
-      <div class="stock-page">
+
+        <!-- PAGE HEADER -->
+
         <header class="stock-heading">
-          <p>INVENTORY MANAGEMENT</p>
-          <h1>Barang Masuk</h1>
-          <p>Catat setiap bahan dan produk yang masuk ke gudang SEDUH SENJA.</p>
+
+            <span class="stock-label">
+                INVENTORY MANAGEMENT
+            </span>
+
+            <h1>Barang Masuk</h1>
+
+            <p>
+                Catat setiap bahan dan produk yang masuk
+                ke gudang SEDUH SENJA.
+            </p>
+
         </header>
 
-        <section class="stock-card">
-          <h2>Tambah Transaksi Barang Masuk</h2>
 
-          <form id="stockInForm">
-            <div class="stock-form">
-              <div class="stock-field">
-                <label for="productId">Nama Produk *</label>
-                <select id="productId" required>
-                  <option value="">Memuat produk...</option>
-                </select>
-              </div>
-
-              <div class="stock-field">
-                <label for="supplierId">Supplier</label>
-                <select id="supplierId">
-                  <option value="">Tanpa supplier</option>
-                </select>
-              </div>
-
-              <div class="stock-field">
-                <label for="transactionDate">Tanggal Masuk *</label>
-                <input type="date" id="transactionDate" required>
-              </div>
-
-              <div class="stock-field">
-                <label for="quantity">Jumlah Masuk *</label>
-                <input type="number" id="quantity" min="0.01" step="0.01"
-                  placeholder="Contoh: 10" required>
-              </div>
-
-              <div class="stock-field">
-                <label for="price">Harga Beli per Satuan (Rp)</label>
-                <input type="number" id="price" min="0" step="1"
-                  placeholder="Contoh: 120000">
-              </div>
-
-              <div class="stock-field full">
-                <label for="notes">Catatan</label>
-                <textarea id="notes" placeholder="Catatan tambahan transaksi..."></textarea>
-              </div>
-            </div>
-
-            <div class="stock-actions">
-              <button type="submit" class="stock-button stock-submit" id="saveStockIn">
-                Simpan Barang Masuk
-              </button>
-              <button type="reset" class="stock-button stock-reset">
-                Reset
-              </button>
-            </div>
-
-            <p id="stockInMessage" class="stock-message" role="status"></p>
-          </form>
-        </section>
+        <!-- ==================================
+             FORM BARANG MASUK
+        =================================== -->
 
         <section class="stock-card">
-          <h2>Riwayat Barang Masuk</h2>
-          <div class="stock-table-wrap">
-            <table class="stock-table">
-              <thead>
-                <tr>
-                  <th>Kode Transaksi</th>
-                  <th>Tanggal</th>
-                  <th>Produk</th>
-                  <th>Supplier</th>
-                  <th>Jumlah</th>
-                  <th>Harga/Satuan</th>
-                  <th>Catatan</th>
-                </tr>
-              </thead>
-              <tbody id="stockInTable">
-                <tr><td colspan="7" class="stock-empty">Memuat data...</td></tr>
-              </tbody>
-            </table>
-          </div>
+
+            <div class="stock-card-header">
+
+                <div>
+                    <h2>Tambah Transaksi Barang Masuk</h2>
+
+                    <p>
+                        Masukkan informasi produk dan jumlah persediaan
+                        yang diterima.
+                    </p>
+                </div>
+
+                <div class="stock-card-icon">
+                    📦
+                </div>
+
+            </div>
+
+
+            <form id="stockInForm">
+
+                <div class="stock-form">
+
+                    <!-- PRODUK -->
+
+                    <div class="stock-field">
+
+                        <label for="productId">
+                            Nama Produk *
+                        </label>
+
+                        <select id="productId" required>
+                            <option value="">
+                                Memuat produk...
+                            </option>
+                        </select>
+
+                    </div>
+
+
+                    <!-- SUPPLIER -->
+
+                    <div class="stock-field">
+
+                        <label for="supplierId">
+                            Supplier
+                        </label>
+
+                        <select id="supplierId">
+                            <option value="">
+                                Tanpa supplier
+                            </option>
+                        </select>
+
+                    </div>
+
+
+                    <!-- TANGGAL -->
+
+                    <div class="stock-field">
+
+                        <label for="transactionDate">
+                            Tanggal Masuk *
+                        </label>
+
+                        <input
+                            type="date"
+                            id="transactionDate"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- JUMLAH -->
+
+                    <div class="stock-field">
+
+                        <label for="quantity">
+                            Jumlah Masuk *
+                        </label>
+
+                        <input
+                            type="number"
+                            id="quantity"
+                            min="0.01"
+                            step="0.01"
+                            placeholder="Contoh: 10"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- HARGA -->
+
+                    <div class="stock-field">
+
+                        <label for="price">
+                            Harga Beli per Satuan (Rp)
+                        </label>
+
+                        <input
+                            type="number"
+                            id="price"
+                            min="0"
+                            step="1"
+                            placeholder="Contoh: 120000"
+                        >
+
+                    </div>
+
+
+                    <!-- CATATAN -->
+
+                    <div class="stock-field full">
+
+                        <label for="notes">
+                            Catatan
+                        </label>
+
+                        <textarea
+                            id="notes"
+                            placeholder="Catatan tambahan transaksi..."
+                        ></textarea>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ACTION BUTTONS -->
+
+                <div class="stock-actions">
+
+                    <button
+                        type="submit"
+                        class="stock-button stock-submit"
+                        id="saveStockIn"
+                    >
+                        ✓ Simpan Barang Masuk
+                    </button>
+
+                    <button
+                        type="reset"
+                        class="stock-button stock-reset"
+                    >
+                        ↻ Reset
+                    </button>
+
+                </div>
+
+                <p
+                    id="stockInMessage"
+                    class="stock-message"
+                    role="status"
+                    aria-live="polite"
+                ></p>
+
+            </form>
+
         </section>
-      </div>
+
+
+        <!-- ==================================
+             RIWAYAT BARANG MASUK
+        =================================== -->
+
+        <section class="stock-card">
+
+            <div class="stock-card-header">
+
+                <div>
+                    <h2>Riwayat Barang Masuk</h2>
+
+                    <p>
+                        Daftar seluruh transaksi barang masuk
+                        yang telah tercatat.
+                    </p>
+                </div>
+
+                <div class="stock-card-icon">
+                    📋
+                </div>
+
+            </div>
+
+
+            <div class="stock-table-wrap">
+
+                <table class="stock-table">
+
+                    <thead>
+
+                        <tr>
+                            <th>KODE TRANSAKSI</th>
+                            <th>TANGGAL</th>
+                            <th>PRODUK</th>
+                            <th>SUPPLIER</th>
+                            <th>JUMLAH</th>
+                            <th>HARGA/SATUAN</th>
+                            <th>CATATAN</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="stockInTable">
+
+                        <tr>
+                            <td colspan="7" class="stock-empty">
+                                Memuat data barang masuk...
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
     </main>
-  </div>
 
-  <script src="/js/stock-in.js"></script>
+</div>
+
+
+<!-- ======================================
+     STOCK IN JAVASCRIPT
+======================================= -->
+
+<script src="/js/stock-in.js"></script>
+<script src="/js/sidebar.js"></script>
+</body>
 </body>
 </html>

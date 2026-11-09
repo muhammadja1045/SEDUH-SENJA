@@ -1,0 +1,593 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Supplier | SEDUH SENJA</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        .supplier-page {
+            padding: 5px 0;
+        }
+
+        .supplier-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .supplier-heading h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 32px;
+            font-weight: 400;
+            margin: 5px 0;
+        }
+
+        .supplier-heading p {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .supplier-eyebrow {
+            color: var(--coffee-brown) !important;
+            font-weight: 700;
+            letter-spacing: 2px;
+            font-size: 10px !important;
+        }
+
+        .supplier-button {
+            border: 0;
+            border-radius: 8px;
+            padding: 12px 18px;
+            background: var(--coffee-brown);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: .2s;
+            white-space: nowrap;
+        }
+
+        .supplier-button:hover {
+            background: var(--coffee-dark);
+            transform: translateY(-1px);
+        }
+
+        .supplier-stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 25px;
+        }
+
+        .supplier-stat {
+            background: white;
+            padding: 22px;
+            border: 1px solid var(--border);
+            border-radius: 13px;
+        }
+
+        .supplier-stat-icon {
+            font-size: 23px;
+            margin-bottom: 15px;
+        }
+
+        .supplier-stat-label {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .supplier-stat-value {
+            font-family: 'DM Serif Display', serif;
+            font-size: 30px;
+            margin-top: 5px;
+        }
+
+        .supplier-panel {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 24px;
+            min-width: 0;
+        }
+
+        .supplier-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .supplier-search {
+            width: 100%;
+            max-width: 350px;
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            outline: none;
+            background: #FAF8F5;
+            color: var(--text);
+        }
+
+        .supplier-search:focus {
+            border-color: var(--coffee-brown);
+        }
+
+        .supplier-count {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .supplier-table-wrap {
+            overflow-x: auto;
+        }
+
+        .supplier-table {
+            width: 100%;
+            min-width: 750px;
+            border-collapse: collapse;
+        }
+
+        .supplier-table th {
+            background: #FAF8F5;
+            color: var(--coffee-brown);
+            font-size: 11px;
+            padding: 15px 12px;
+            text-align: left;
+        }
+
+        .supplier-table td {
+            padding: 15px 12px;
+            font-size: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .supplier-name {
+            font-weight: 700;
+            color: var(--coffee-dark);
+        }
+
+        .supplier-contact {
+            color: var(--muted);
+        }
+
+        .supplier-actions {
+            display: flex;
+            gap: 7px;
+        }
+
+        .supplier-action {
+            border: 0;
+            border-radius: 6px;
+            padding: 7px 10px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .supplier-edit {
+            background: #F1E8DF;
+            color: var(--coffee-brown);
+        }
+
+        .supplier-delete {
+            background: #F8E9E6;
+            color: var(--red);
+        }
+
+        .supplier-empty {
+            text-align: center;
+            padding: 35px !important;
+            color: var(--muted);
+        }
+
+        .supplier-message {
+            margin-top: 15px;
+            font-size: 12px;
+            min-height: 18px;
+        }
+
+        /* MODAL */
+
+        .supplier-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(36, 26, 22, .65);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .supplier-modal.show {
+            display: flex;
+        }
+
+        .supplier-modal-content {
+            width: 100%;
+            max-width: 520px;
+            background: var(--cream);
+            border-radius: 15px;
+            padding: 28px;
+            box-shadow: 0 15px 50px rgba(0,0,0,.2);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .supplier-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        .supplier-modal-header h2 {
+            font-family: 'DM Serif Display', serif;
+            font-weight: 400;
+            font-size: 25px;
+        }
+
+        .supplier-close {
+            border: 0;
+            background: transparent;
+            font-size: 25px;
+            cursor: pointer;
+            color: var(--muted);
+        }
+
+        .supplier-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .supplier-field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .supplier-field label {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .supplier-field input,
+        .supplier-field textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #D7CABB;
+            border-radius: 8px;
+            background: white;
+            color: var(--text);
+            font: inherit;
+            font-size: 13px;
+        }
+
+        .supplier-field textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        .supplier-field input:focus,
+        .supplier-field textarea:focus {
+            outline: none;
+            border-color: var(--coffee-brown);
+        }
+
+        .supplier-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .supplier-cancel {
+            background: var(--beige);
+            color: var(--text);
+        }
+
+        .supplier-submit {
+            background: var(--coffee-brown);
+            color: white;
+        }
+
+        @media(max-width: 760px) {
+            .supplier-heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .supplier-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .supplier-toolbar {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .supplier-search {
+                max-width: none;
+            }
+
+            .supplier-panel {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+      <a href="/" class="sidebar-brand" aria-label="SEDUH SENJA">
+    <img
+        src="/images/logo-seduh-senja.png"
+        alt="Logo SEDUH SENJA"
+    >
+</a>
+
+        <div class="menu-title">MENU UTAMA</div>
+
+        <nav class="nav-menu">
+            <a href="/" class="nav-link">
+                <span class="nav-icon">⌂</span>
+                Dashboard
+            </a>
+
+            <a href="/inventory" class="nav-link">
+                <span class="nav-icon">▦</span>
+                Inventaris
+            </a>
+
+            <a href="/stock-in" class="nav-link">
+                <span class="nav-icon">↙</span>
+                Barang Masuk
+            </a>
+
+            <a href="/stock-out" class="nav-link">
+                <span class="nav-icon">↗</span>
+                Barang Keluar
+            </a>
+
+            <a href="/categories" class="nav-link">
+                <span class="nav-icon">▤</span>
+                Kategori
+            </a>
+
+            <a href="/suppliers" class="nav-link active">
+                <span class="nav-icon">♙</span>
+                Supplier
+            </a>
+        </nav>
+
+        <div class="menu-title">LAINNYA</div>
+
+        <nav class="nav-menu">
+            <a href="/reports" class="nav-link">
+                <span class="nav-icon">▧</span>
+                Laporan
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <strong>SEDUH SENJA</strong><br>
+            Coffee Inventory System<br>
+            <span>Inventory Management</span>
+        </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <div class="topbar">
+            <div class="page-heading">
+                <h2>Supplier Management</h2>
+                <p>Kelola data pemasok bahan baku SEDUH SENJA.</p>
+            </div>
+
+            <div class="admin-profile">
+                <div class="avatar">A</div>
+                <div class="admin-info">
+                    <strong>Administrator</strong>
+                    <span>System Admin</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="supplier-page">
+
+            <!-- HEADER -->
+            <header class="supplier-heading">
+                <div>
+                    <p class="supplier-eyebrow">INVENTORY MANAGEMENT</p>
+                    <h1>Daftar Supplier</h1>
+                    <p>Kelola informasi supplier dan pemasok bahan baku coffee shop.</p>
+                </div>
+
+                <button class="supplier-button" id="addSupplierButton">
+                    + Tambah Supplier
+                </button>
+            </header>
+
+            <!-- STATISTIK -->
+            <section class="supplier-stats">
+
+                <div class="supplier-stat">
+                    <div class="supplier-stat-icon">🏢</div>
+                    <p class="supplier-stat-label">Total Supplier</p>
+                    <h2 class="supplier-stat-value" id="totalSuppliers">0</h2>
+                </div>
+
+                <div class="supplier-stat">
+                    <div class="supplier-stat-icon">📞</div>
+                    <p class="supplier-stat-label">Supplier dengan Kontak</p>
+                    <h2 class="supplier-stat-value" id="suppliersWithPhone">0</h2>
+                </div>
+
+                <div class="supplier-stat">
+                    <div class="supplier-stat-icon">📍</div>
+                    <p class="supplier-stat-label">Supplier dengan Alamat</p>
+                    <h2 class="supplier-stat-value" id="suppliersWithAddress">0</h2>
+                </div>
+
+            </section>
+
+            <!-- TABEL SUPPLIER -->
+            <section class="supplier-panel">
+
+                <h3>Data Supplier</h3>
+                <p style="color:var(--muted);font-size:12px;margin-top:6px;">
+                    Informasi seluruh pemasok yang terdaftar dalam sistem.
+                </p>
+
+                <div class="supplier-toolbar">
+
+                    <input
+                        type="search"
+                        id="supplierSearch"
+                        class="supplier-search"
+                        placeholder="🔍 Cari nama, telepon, atau alamat supplier..."
+                    >
+
+                    <span class="supplier-count" id="supplierCount">
+                        0 supplier
+                    </span>
+
+                </div>
+
+                <div class="supplier-table-wrap">
+
+                    <table class="supplier-table">
+
+                        <thead>
+                            <tr>
+                                <th>NO</th>
+                                <th>NAMA SUPPLIER</th>
+                                <th>TELEPON</th>
+                                <th>ALAMAT</th>
+                                <th>TANGGAL DAFTAR</th>
+                                <th>AKSI</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="supplierTable">
+                            <tr>
+                                <td colspan="6" class="supplier-empty">
+                                    Memuat data supplier...
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <p id="supplierMessage" class="supplier-message" role="status"></p>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+<!-- MODAL TAMBAH / EDIT -->
+<div class="supplier-modal" id="supplierModal">
+
+    <div class="supplier-modal-content">
+
+        <div class="supplier-modal-header">
+            <h2 id="modalTitle">Tambah Supplier</h2>
+
+            <button
+                type="button"
+                class="supplier-close"
+                id="closeSupplierModal"
+                aria-label="Tutup"
+            >&times;</button>
+        </div>
+
+        <form id="supplierForm">
+
+            <input type="hidden" id="supplierId">
+
+            <div class="supplier-form">
+
+                <div class="supplier-field">
+                    <label for="supplierName">Nama Supplier *</label>
+                    <input
+                        type="text"
+                        id="supplierName"
+                        maxlength="100"
+                        placeholder="Contoh: PT Sumber Kopi Indonesia"
+                        required
+                    >
+                </div>
+
+                <div class="supplier-field">
+                    <label for="supplierPhone">Nomor Telepon</label>
+                    <input
+                        type="tel"
+                        id="supplierPhone"
+                        maxlength="30"
+                        placeholder="Contoh: 081234567890"
+                    >
+                </div>
+
+                <div class="supplier-field">
+                    <label for="supplierAddress">Alamat Supplier</label>
+                    <textarea
+                        id="supplierAddress"
+                        maxlength="500"
+                        placeholder="Masukkan alamat lengkap supplier..."
+                    ></textarea>
+                </div>
+
+                <div class="supplier-modal-actions">
+
+                    <button
+                        type="button"
+                        class="supplier-button supplier-cancel"
+                        id="cancelSupplier"
+                    >
+                        Batal
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="supplier-button supplier-submit"
+                        id="saveSupplier"
+                    >
+                        Simpan Supplier
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script src="/js/supplier.js"></script>
+<script src="/js/sidebar.js"></script>
+</body>
+</body>
+</html>

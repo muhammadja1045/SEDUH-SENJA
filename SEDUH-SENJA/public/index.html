@@ -1,18 +1,22 @@
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#241A16">
 
-    <title>SEDUH SENJA | Dashboard Inventory</title>
+    <title>SEDUH SENJA | Dashboard</title>
 
+    <!-- GOOGLE FONTS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap"
+          rel="stylesheet">
 
+    <!-- MAIN CSS -->
     <link rel="stylesheet" href="/css/style.css">
 </head>
 
@@ -20,108 +24,140 @@
 
 <div class="app">
 
-    <!-- SIDEBAR -->
+    <!-- ==========================================
+         SIDEBAR
+    =========================================== -->
+
     <aside class="sidebar">
 
-        <div class="brand">
-            <h1>SEDUH SENJA</h1>
-            <p>COFFEE INVENTORY SYSTEM</p>
+        <!-- BRAND LOGO -->
+        <div class="sidebar-brand">
+
+           <a href="/" class="sidebar-brand" aria-label="SEDUH SENJA">
+    <img
+        src="/images/logo-seduh-senja.png"
+        alt="Logo SEDUH SENJA"
+    >
+</a>
         </div>
 
-        <p class="menu-title">MENU UTAMA</p>
 
-        <nav class="nav-menu">
+        <!-- SIDEBAR NAVIGATION -->
+        <div class="sidebar-navigation">
 
-            <a href="/" class="nav-link active">
-                <span class="nav-icon">⌂</span>
-                Dashboard
-            </a>
+            <p class="menu-title">MENU UTAMA</p>
 
-            <a href="/inventory" class="nav-link">
-                <span class="nav-icon">▦</span>
-                Inventaris
-            </a>
+            <nav class="nav-menu">
 
-            <a href="/stock-in" class="nav-link">
-                <span class="nav-icon">↙</span>
-                Barang Masuk
-            </a>
+                <a href="/" class="nav-link active">
+                    <span class="nav-icon">⌂</span>
+                    <span>Dashboard</span>
+                </a>
 
-            <a href="/stock-out" class="nav-link">
-                <span class="nav-icon">↗</span>
-                Barang Keluar
-            </a>
+                <a href="/inventory" class="nav-link">
+                    <span class="nav-icon">▦</span>
+                    <span>Inventaris</span>
+                </a>
 
-            <a href="/categories" class="nav-link">
-                <span class="nav-icon">▤</span>
-                Kategori
-            </a>
+                <a href="/stock-in" class="nav-link">
+                    <span class="nav-icon">↙</span>
+                    <span>Barang Masuk</span>
+                </a>
 
-            <a href="/suppliers" class="nav-link">
-                <span class="nav-icon">♙</span>
-                Supplier
-            </a>
+                <a href="/stock-out" class="nav-link">
+                    <span class="nav-icon">↗</span>
+                    <span>Barang Keluar</span>
+                </a>
 
-        </nav>
+                <a href="/categories" class="nav-link">
+                    <span class="nav-icon">▤</span>
+                    <span>Kategori</span>
+                </a>
 
-        <p class="menu-title">LAINNYA</p>
+                <a href="/suppliers" class="nav-link">
+                    <span class="nav-icon">♙</span>
+                    <span>Supplier</span>
+                </a>
 
-        <nav class="nav-menu">
+            </nav>
 
-            <a href="/reports" class="nav-link">
-                <span class="nav-icon">▧</span>
-                Laporan
-            </a>
 
-            <a href="/settings" class="nav-link">
-                <span class="nav-icon">⚙</span>
-                Pengaturan
-            </a>
+            <!-- OTHER MENU -->
+            <p class="menu-title other-title">LAINNYA</p>
 
-        </nav>
+            <nav class="nav-menu">
 
-        <div class="sidebar-footer">
-            SEDUH SENJA<br>
-            Inventory Management System<br>
-            Version 1.0.0
+                <a href="/reports" class="nav-link">
+                    <span class="nav-icon">▧</span>
+                    <span>Laporan</span>
+                </a>
+
+                <a href="/settings" class="nav-link">
+                    <span class="nav-icon">⚙</span>
+                    <span>Pengaturan</span>
+                </a>
+
+            </nav>
+
         </div>
 
     </aside>
 
 
-    <!-- MAIN CONTENT -->
+    <!-- ==========================================
+         MAIN CONTENT
+    =========================================== -->
+
     <main class="main-content">
+
 
         <!-- TOPBAR -->
         <header class="topbar">
 
             <div class="page-heading">
+
                 <h2>Dashboard Overview</h2>
-                <p>Selamat datang di sistem inventaris Seduh Senja.</p>
+
+                <p>
+                    Selamat datang di sistem inventaris Seduh Senja.
+                </p>
+
             </div>
 
+
+            <!-- ADMIN PROFILE -->
             <div class="admin-profile">
+
                 <div class="avatar">A</div>
 
                 <div class="admin-info">
+
                     <strong>Administrator</strong>
+
                     <span>System Admin</span>
+
                 </div>
+
             </div>
 
         </header>
 
 
-        <!-- WELCOME CARD -->
+        <!-- ======================================
+             WELCOME SECTION
+        ======================================= -->
+
         <section class="welcome-card">
 
             <div>
+
                 <h3>Selamat Datang di Seduh Senja</h3>
 
                 <p>
                     Kelola persediaan bahan baku dan kebutuhan coffee shop
                     dengan lebih mudah, terstruktur, dan efisien.
                 </p>
+
             </div>
 
             <div class="welcome-icon">☕</div>
@@ -129,7 +165,10 @@
         </section>
 
 
-        <!-- STATISTICS -->
+        <!-- ======================================
+             INVENTORY STATISTICS
+        ======================================= -->
+
         <div class="section-heading">
 
             <h3>Ringkasan Inventaris</h3>
@@ -143,15 +182,25 @@
 
         <section class="stats-grid">
 
-            <!-- TOTAL PRODUK -->
+
+            <!-- TOTAL PRODUCTS -->
             <div class="stat-card">
 
                 <div class="stat-top">
-                    <span class="stat-label">TOTAL BARANG</span>
-                    <span class="stat-icon icon-brown">▦</span>
+
+                    <span class="stat-label">
+                        TOTAL BARANG
+                    </span>
+
+                    <span class="stat-icon icon-brown">
+                        ▦
+                    </span>
+
                 </div>
 
-                <div class="stat-value" id="totalProducts">0</div>
+                <div class="stat-value" id="totalProducts">
+                    0
+                </div>
 
                 <p class="stat-note">
                     Jenis produk terdaftar
@@ -160,15 +209,24 @@
             </div>
 
 
-            <!-- BARANG MASUK -->
+            <!-- STOCK IN -->
             <div class="stat-card">
 
                 <div class="stat-top">
-                    <span class="stat-label">BARANG MASUK HARI INI</span>
-                    <span class="stat-icon icon-green">↓</span>
+
+                    <span class="stat-label">
+                        BARANG MASUK HARI INI
+                    </span>
+
+                    <span class="stat-icon icon-green">
+                        ↓
+                    </span>
+
                 </div>
 
-                <div class="stat-value" id="stockIn">0</div>
+                <div class="stat-value" id="stockIn">
+                    0
+                </div>
 
                 <p class="stat-note">
                     Total jumlah barang masuk
@@ -177,15 +235,24 @@
             </div>
 
 
-            <!-- BARANG KELUAR -->
+            <!-- STOCK OUT -->
             <div class="stat-card">
 
                 <div class="stat-top">
-                    <span class="stat-label">BARANG KELUAR HARI INI</span>
-                    <span class="stat-icon icon-beige">↑</span>
+
+                    <span class="stat-label">
+                        BARANG KELUAR HARI INI
+                    </span>
+
+                    <span class="stat-icon icon-beige">
+                        ↑
+                    </span>
+
                 </div>
 
-                <div class="stat-value" id="stockOut">0</div>
+                <div class="stat-value" id="stockOut">
+                    0
+                </div>
 
                 <p class="stat-note">
                     Total jumlah barang keluar
@@ -194,15 +261,24 @@
             </div>
 
 
-            <!-- STOK MENIPIS -->
+            <!-- LOW STOCK -->
             <div class="stat-card">
 
                 <div class="stat-top">
-                    <span class="stat-label">STOK MENIPIS</span>
-                    <span class="stat-icon icon-red">!</span>
+
+                    <span class="stat-label">
+                        STOK MENIPIS
+                    </span>
+
+                    <span class="stat-icon icon-red">
+                        !
+                    </span>
+
                 </div>
 
-                <div class="stat-value" id="lowStock">0</div>
+                <div class="stat-value" id="lowStock">
+                    0
+                </div>
 
                 <p class="stat-note">
                     Produk perlu diperhatikan
@@ -213,11 +289,14 @@
         </section>
 
 
-        <!-- CHART AND STOCK SUMMARY -->
+        <!-- ======================================
+             CHART AND STOCK SUMMARY
+        ======================================= -->
+
         <section class="content-grid">
 
 
-            <!-- ACTIVITY CHART -->
+            <!-- INVENTORY ACTIVITY -->
             <div class="panel">
 
                 <div class="panel-header">
@@ -231,85 +310,146 @@
 
                 <div class="chart">
 
+
                     <div class="chart-column">
+
                         <div class="chart-bars">
+
                             <div class="bar" style="height:35%"></div>
+
                             <div class="bar out" style="height:20%"></div>
+
                         </div>
+
                         <small>Sen</small>
+
                     </div>
 
+
                     <div class="chart-column">
+
                         <div class="chart-bars">
+
                             <div class="bar" style="height:65%"></div>
+
                             <div class="bar out" style="height:30%"></div>
+
                         </div>
+
                         <small>Sel</small>
+
                     </div>
 
+
                     <div class="chart-column">
+
                         <div class="chart-bars">
+
                             <div class="bar" style="height:45%"></div>
+
                             <div class="bar out" style="height:25%"></div>
+
                         </div>
+
                         <small>Rab</small>
+
                     </div>
 
+
                     <div class="chart-column">
+
                         <div class="chart-bars">
+
                             <div class="bar" style="height:85%"></div>
+
                             <div class="bar out" style="height:45%"></div>
+
                         </div>
+
                         <small>Kam</small>
+
                     </div>
 
+
                     <div class="chart-column">
+
                         <div class="chart-bars">
+
                             <div class="bar" style="height:55%"></div>
+
                             <div class="bar out" style="height:35%"></div>
+
                         </div>
+
                         <small>Jum</small>
+
                     </div>
 
+
                     <div class="chart-column">
+
                         <div class="chart-bars">
+
                             <div class="bar" style="height:70%"></div>
+
                             <div class="bar out" style="height:40%"></div>
+
                         </div>
+
                         <small>Sab</small>
+
                     </div>
 
+
                     <div class="chart-column">
+
                         <div class="chart-bars">
+
                             <div class="bar" style="height:30%"></div>
+
                             <div class="bar out" style="height:15%"></div>
+
                         </div>
+
                         <small>Min</small>
+
                     </div>
 
                 </div>
 
 
+                <!-- CHART LEGEND -->
                 <div class="chart-legend">
 
                     <div class="legend-item">
+
                         <span class="legend-dot"></span>
+
                         Barang masuk
+
                     </div>
 
+
                     <div class="legend-item">
+
                         <span class="legend-dot out"></span>
+
                         Barang keluar
+
                     </div>
 
                 </div>
 
-                <p class="stat-note" style="margin-top:15px">
+
+                <p class="stat-note chart-note">
+
                     Grafik saat ini masih berupa ilustrasi.
-                    Integrasi data transaksi mingguan akan dibuat pada tahap laporan.
+                    Integrasi transaksi mingguan akan dilakukan pada tahap berikutnya.
+
                 </p>
 
             </div>
+
 
 
             <!-- STOCK SUMMARY -->
@@ -327,14 +467,17 @@
                 <div class="stock-status" id="unitSummary">
 
                     <div class="stock-row">
+
                         <span>Memuat data...</span>
+
                         <strong>...</strong>
+
                     </div>
 
                 </div>
 
 
-                <p class="stat-note" style="margin-top:20px">
+                <p class="stat-note stock-note">
 
                     Stok ditampilkan terpisah berdasarkan satuan
                     agar Kg, Liter, dan Pcs tidak dijumlahkan secara keliru.
@@ -346,8 +489,12 @@
         </section>
 
 
-        <!-- PRODUCT TABLE -->
-        <section class="panel">
+
+        <!-- ======================================
+             LATEST PRODUCTS
+        ======================================= -->
+
+        <section class="panel product-panel">
 
             <div class="panel-header">
 
@@ -367,11 +514,17 @@
                     <thead>
 
                         <tr>
+
                             <th>KODE</th>
+
                             <th>NAMA BARANG</th>
+
                             <th>KATEGORI</th>
+
                             <th>STOK</th>
+
                             <th>STATUS</th>
+
                         </tr>
 
                     </thead>
@@ -396,33 +549,45 @@
         </section>
 
 
-        <!-- CONNECTION STATUS -->
+
+        <!-- ======================================
+             CONNECTION STATUS
+        ======================================= -->
+
         <p
             id="connectionStatus"
-            class="stat-note"
-            style="margin-top:18px"
+            class="stat-note connection-status"
             role="status"
         >
             Menghubungkan ke database...
         </p>
 
 
-        <!-- FOOTER -->
-        <footer style="margin-top:30px;padding:20px 0;text-align:center">
 
-            <p class="stat-note">
+        <!-- ======================================
+             FOOTER
+        ======================================= -->
+
+        <footer class="page-footer">
+
+            <p>
                 © 2026 SEDUH SENJA — Coffee Inventory Management System
             </p>
 
         </footer>
+
 
     </main>
 
 </div>
 
 
-<!-- DASHBOARD JAVASCRIPT -->
+<!-- ==========================================
+     JAVASCRIPT
+=========================================== -->
+
 <script src="/js/dashboard.js"></script>
+<script src="/js/sidebar.js"></script>
 
 </body>
 </html>

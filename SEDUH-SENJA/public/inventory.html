@@ -5,76 +5,151 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#241A16">
-
+    <meta name="description" content="Sistem manajemen inventaris SEDUH SENJA.">
     <title>Inventaris | SEDUH SENJA</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="/css/style.css">
 
     <style>
         :root {
-            --coffee: #6F4E37;
-            --coffee-dark: #241A16;
-            --cream: #F7F3ED;
-            --muted: #A99A8D;
-            --border: #E8DED2;
-            --green: #287A48;
-            --red: #B84A3A;
+            --inv-dark: #241A16;
+            --inv-dark-soft: #30231D;
+            --inv-brown: #79543A;
+            --inv-brown-light: #98704E;
+            --inv-gold: #C49A70;
+            --inv-cream: #F8F5F0;
+            --inv-white: #FFFFFF;
+            --inv-soft: #F1E8DF;
+            --inv-text: #30231D;
+            --inv-muted: #95877C;
+            --inv-border: #E8DED2;
+            --inv-green: #287A48;
+            --inv-green-bg: #E9F2E9;
+            --inv-orange: #A56320;
+            --inv-orange-bg: #F9EEDC;
+            --inv-red: #B84A3A;
+            --inv-red-bg: #F8E9E6;
+            --inv-radius: 14px;
+            --inv-shadow: 0 5px 22px rgba(48,35,29,.045);
+        }
+
+        .inventory-page,
+        .inventory-page *,
+        .inventory-page *::before,
+        .inventory-page *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--inv-cream);
+            color: var(--inv-text);
+            font-family: 'Inter', sans-serif;
         }
 
         .inventory-page {
+            width: 100%;
+            min-width: 0;
             padding: 30px;
-            color: #F5EBDD;
+            color: var(--inv-text);
         }
+
+        .inventory-page button,
+        .inventory-page input,
+        .inventory-page select,
+        .inventory-page textarea {
+            font: inherit;
+        }
+
+        .inventory-page button {
+            cursor: pointer;
+        }
+
+        .inventory-page button:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+        }
+
+        /* HEADER */
 
         .inventory-heading {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            gap: 18px;
-            margin-bottom: 26px;
+            justify-content: space-between;
             flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 27px;
         }
 
         .inventory-heading .eyebrow {
-            color: #B58A62;
-            font-size: 11px;
+            color: var(--inv-brown);
+            font-size: 10px;
             font-weight: 800;
             letter-spacing: 2px;
         }
 
         .inventory-heading h1 {
+            margin: 9px 0;
+            color: var(--inv-dark);
             font-family: 'DM Serif Display', serif;
-            font-size: 34px;
-            margin: 8px 0;
+            font-size: 32px;
+            font-weight: 400;
         }
 
         .inventory-heading p {
-            color: #B9AAA0;
-            font-size: 14px;
             margin: 0;
+            color: var(--inv-muted);
+            font-size: 12px;
+            line-height: 1.8;
         }
 
-        .primary-btn {
-            background: #8A6245;
-            color: white;
-            border: none;
+        .header-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* BUTTONS */
+
+        .inventory-page .primary-btn,
+        .inventory-page .secondary-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            min-height: 42px;
+            padding: 11px 16px;
+            border: 1px solid transparent;
             border-radius: 9px;
-            padding: 13px 18px;
-            font: inherit;
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 700;
-            cursor: pointer;
-            transition: .2s;
+            transition: .2s ease;
         }
 
-        .primary-btn:hover {
-            background: #6F4E37;
-            transform: translateY(-1px);
+        .inventory-page .primary-btn {
+            background: var(--inv-brown);
+            color: white;
         }
+
+        .inventory-page .primary-btn:hover {
+            background: var(--inv-brown-light);
+            transform: translateY(-2px);
+        }
+
+        .inventory-page .secondary-btn {
+            background: var(--inv-soft);
+            color: var(--inv-brown);
+        }
+
+        .inventory-page .secondary-btn:hover {
+            background: #E8D9C9;
+            transform: translateY(-2px);
+        }
+
+        /* STATISTICS */
 
         .summary-grid {
             display: grid;
@@ -84,230 +159,467 @@
         }
 
         .summary-card {
-            background: #30231D;
-            border: 1px solid rgba(255,255,255,.06);
-            border-radius: 13px;
-            padding: 20px;
+            min-width: 0;
+            padding: 22px;
+            background: var(--inv-white);
+            border: 1px solid var(--inv-border);
+            border-radius: var(--inv-radius);
+            box-shadow: var(--inv-shadow);
+            transition: .2s ease;
         }
 
-        .summary-card span {
-            color: #B9AAA0;
-            font-size: 12px;
-        }
-
-        .summary-card h2 {
-            font-size: 27px;
-            margin: 10px 0 0;
-            color: #F5EBDD;
+        .summary-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 28px rgba(48,35,29,.08);
         }
 
         .summary-icon {
-            font-size: 20px;
-            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 43px;
+            height: 43px;
+            margin-bottom: 17px;
+            border-radius: 11px;
+            background: var(--inv-soft);
+            color: var(--inv-brown);
+            font-size: 17px;
         }
 
-        .inventory-card {
-            background: var(--cream);
-            color: var(--coffee-dark);
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 24px;
-            box-shadow: 0 8px 25px rgba(0,0,0,.12);
+        .summary-card span {
+            display: block;
+            color: var(--inv-muted);
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .summary-card h2 {
+            margin: 8px 0 0;
+            color: var(--inv-dark);
+            font-family: 'DM Serif Display', serif;
+            font-size: 31px;
+            font-weight: 400;
+        }
+
+        /* CARDS */
+
+        .inventory-card,
+        .category-card {
+            min-width: 0;
+            padding: 24px;
+            margin-bottom: 23px;
+            background: var(--inv-white);
+            border: 1px solid var(--inv-border);
+            border-radius: var(--inv-radius);
+            box-shadow: var(--inv-shadow);
+        }
+
+        .category-card {
+            display: none;
+        }
+
+        .category-card.show {
+            display: block;
+            animation: inventoryAppear .25s ease;
+        }
+
+        @keyframes inventoryAppear {
+            from {
+                opacity: 0;
+                transform: translateY(-7px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .inventory-card-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 15px;
             flex-wrap: wrap;
+            gap: 15px;
             margin-bottom: 20px;
         }
 
         .inventory-card-header h2 {
             margin: 0;
-            font-size: 19px;
-        }
-
-        .toolbar {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
-
-        .toolbar input,
-        .toolbar select {
-            padding: 11px 13px;
-            border: 1px solid #DED2C3;
-            border-radius: 8px;
-            background: white;
-            color: #241A16;
-            font: inherit;
-            font-size: 13px;
-            outline: none;
-        }
-
-        .toolbar input {
-            flex: 1;
-            min-width: 180px;
-        }
-
-        .toolbar select {
-            min-width: 160px;
-        }
-
-        .table-wrap {
-            overflow-x: auto;
-        }
-
-        .inventory-table {
-            width: 100%;
-            min-width: 850px;
-            border-collapse: collapse;
-        }
-
-        .inventory-table th,
-        .inventory-table td {
-            text-align: left;
-            padding: 15px 12px;
-            border-bottom: 1px solid var(--border);
-            font-size: 13px;
-        }
-
-        .inventory-table th {
-            color: #806044;
-            font-size: 11px;
-            letter-spacing: .6px;
+            color: var(--inv-dark);
+            font-size: 16px;
             font-weight: 800;
         }
 
-        .inventory-table td {
-            color: #46372D;
+        .inventory-card-header h2 i {
+            margin-right: 8px;
+            color: var(--inv-brown);
         }
 
-        .product-name {
-            font-weight: 700;
-            color: #30231D !important;
+        .section-description {
+            margin: 7px 0 0;
+            color: var(--inv-muted);
+            font-size: 11px;
+            line-height: 1.7;
         }
 
-        .product-code {
-            color: #98704E !important;
-            font-weight: 700;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 6px 10px;
+        #productCount {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 13px;
+            background: var(--inv-soft);
+            color: var(--inv-brown);
             border-radius: 20px;
             font-size: 10px;
             font-weight: 800;
             white-space: nowrap;
         }
 
+        /* CATEGORY */
+
+        .category-summary {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .category-summary-item {
+            min-width: 170px;
+            padding: 16px 19px;
+            background: #FAF8F5;
+            border: 1px solid var(--inv-border);
+            border-radius: 10px;
+        }
+
+        .category-summary-item span {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--inv-muted);
+            font-size: 11px;
+        }
+
+        .category-summary-item strong {
+            display: block;
+            color: var(--inv-dark);
+            font-size: 24px;
+        }
+
+        /* TOOLBAR */
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 19px;
+        }
+
+        .toolbar input,
+        .toolbar select {
+            min-height: 42px;
+            padding: 10px 13px;
+            background: white;
+            color: var(--inv-text);
+            border: 1px solid var(--inv-border);
+            border-radius: 8px;
+            font-size: 11px;
+            outline: none;
+            transition: .2s ease;
+        }
+
+        .toolbar input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .toolbar select {
+            min-width: 165px;
+        }
+
+        .toolbar input:focus,
+        .toolbar select:focus {
+            border-color: var(--inv-brown);
+            box-shadow: 0 0 0 3px rgba(121,84,58,.09);
+        }
+
+        /* TABLE */
+
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--inv-border);
+            border-radius: 10px;
+        }
+
+        .inventory-table,
+        .category-table {
+            width: 100%;
+            border-collapse: collapse;
+            white-space: nowrap;
+        }
+
+        .inventory-table {
+            min-width: 850px;
+        }
+
+        .category-table {
+            min-width: 550px;
+        }
+
+        .inventory-table th,
+        .inventory-table td,
+        .category-table th,
+        .category-table td {
+            padding: 14px 13px;
+            text-align: left;
+            border-bottom: 1px solid var(--inv-border);
+            font-size: 11px;
+        }
+
+        .inventory-table th,
+        .category-table th {
+            background: #FAF8F5;
+            color: var(--inv-muted);
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: .7px;
+        }
+
+        .inventory-table td,
+        .category-table td {
+            color: #514238;
+        }
+
+        .inventory-table tbody tr:last-child td,
+        .category-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .inventory-table tbody tr:hover,
+        .category-table tbody tr:hover {
+            background: #FCFAF7;
+        }
+
+        .product-name,
+        .category-name {
+            color: var(--inv-dark) !important;
+            font-weight: 800;
+        }
+
+        .product-code {
+            color: var(--inv-brown-light) !important;
+            font-weight: 800;
+        }
+
+        /* STATUS */
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 9px;
+            font-weight: 800;
+        }
+
         .status-safe {
-            background: #DCEFE2;
-            color: #287A48;
+            background: var(--inv-green-bg);
+            color: var(--inv-green);
         }
 
         .status-low {
-            background: #F9E7D4;
-            color: #A56320;
+            background: var(--inv-orange-bg);
+            color: var(--inv-orange);
         }
 
         .status-empty {
-            background: #F5DEDA;
-            color: #B84A3A;
+            background: var(--inv-red-bg);
+            color: var(--inv-red);
         }
 
-        .action-group {
+        .category-count {
+            display: inline-block;
+            padding: 6px 10px;
+            background: var(--inv-soft);
+            color: var(--inv-brown);
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        /* ACTIONS */
+
+        .action-group,
+        .category-actions {
             display: flex;
+            align-items: center;
             gap: 7px;
         }
 
-        .action-btn {
-            border: 0;
-            border-radius: 6px;
+        .action-btn,
+        .category-action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-height: 30px;
             padding: 7px 10px;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: 700;
+            border: none;
+            border-radius: 7px;
+            font-size: 10px;
+            font-weight: 800;
+            transition: .2s ease;
         }
 
-        .edit-btn {
-            background: #E8DED2;
-            color: #63452F;
+        .action-btn:hover,
+        .category-action-btn:hover {
+            transform: translateY(-1px);
+            filter: brightness(.96);
         }
 
-        .archive-btn {
-            background: #F5DEDA;
-            color: #B84A3A;
+        .edit-btn,
+        .category-action-btn.edit {
+            background: var(--inv-soft);
+            color: var(--inv-brown);
         }
+
+        .archive-btn,
+        .category-action-btn.delete {
+            background: var(--inv-red-bg);
+            color: var(--inv-red);
+        }
+
+        /* EMPTY STATE */
 
         .empty-state {
-            text-align: center !important;
             padding: 35px !important;
-            color: #95877C !important;
+            text-align: center !important;
+            color: var(--inv-muted) !important;
+            font-size: 11px !important;
         }
+
+        /* CONNECTION */
 
         .connection-status {
-            color: #B9AAA0;
-            font-size: 12px;
-            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin-top: 15px;
+            color: var(--inv-muted);
+            font-size: 10px;
         }
 
-        /* MODAL FORM */
+        .category-message {
+            min-height: 18px;
+            margin-top: 13px;
+            color: var(--inv-muted);
+            font-size: 11px;
+        }
 
-        .modal {
+        .category-message.success {
+            color: var(--inv-green);
+        }
+
+        .category-message.error {
+            color: var(--inv-red);
+        }
+
+        /* MODALS */
+
+        .inventory-modal {
             display: none;
             position: fixed;
             inset: 0;
-            z-index: 1000;
-            background: rgba(10,7,5,.75);
-            padding: 20px;
-            overflow-y: auto;
+            z-index: 2000;
             align-items: center;
             justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+            background: rgba(36,26,22,.70);
+            backdrop-filter: blur(4px);
         }
 
-        .modal.show {
+        .inventory-modal.show {
             display: flex;
         }
 
-        .modal-content {
-            background: #F7F3ED;
-            color: #241A16;
+        .inventory-modal .modal-content {
             width: 100%;
-            max-width: 600px;
-            border-radius: 16px;
-            padding: 27px;
-            box-shadow: 0 20px 60px rgba(0,0,0,.3);
+            max-width: 620px;
             margin: auto;
+            padding: 27px;
+            background: white;
+            color: var(--inv-text);
+            border: 1px solid rgba(255,255,255,.5);
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.22);
+            animation: modalAppear .2s ease;
+        }
+
+        .inventory-modal .category-modal-content {
+            max-width: 460px;
+        }
+
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .modal-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 22px;
+            gap: 15px;
+            margin-bottom: 23px;
         }
 
         .modal-header h2 {
-            font-size: 21px;
             margin: 0;
+            color: var(--inv-dark);
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .modal-eyebrow {
+            display: block;
+            margin-bottom: 7px;
+            color: var(--inv-brown);
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
         }
 
         .close-modal {
-            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            flex-shrink: 0;
             border: none;
-            font-size: 25px;
-            color: #806044;
-            cursor: pointer;
+            border-radius: 8px;
+            background: var(--inv-soft);
+            color: var(--inv-brown);
+            font-size: 21px;
+            transition: .2s;
         }
+
+        .close-modal:hover {
+            background: #E8D9C9;
+        }
+
+        /* PRODUCT FORM */
 
         .product-form {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(2,minmax(0,1fr));
             gap: 16px;
         }
 
@@ -315,75 +627,202 @@
             display: flex;
             flex-direction: column;
             gap: 7px;
+            min-width: 0;
         }
 
         .form-field.full {
             grid-column: 1 / -1;
         }
 
-        .form-field label {
-            font-size: 12px;
+        .form-field label,
+        .category-form label {
+            color: #49372A;
+            font-size: 10px;
             font-weight: 800;
         }
 
         .form-field input,
-        .form-field select {
-            padding: 12px;
-            border: 1px solid #DED2C3;
+        .form-field select,
+        .form-field textarea,
+        .category-form input,
+        .category-form textarea {
+            width: 100%;
+            min-height: 42px;
+            padding: 11px 12px;
+            border: 1px solid var(--inv-border);
             border-radius: 8px;
             background: white;
-            font: inherit;
-            font-size: 13px;
+            color: var(--inv-text);
+            font-size: 11px;
             outline: none;
-            box-sizing: border-box;
-            width: 100%;
+            transition: .2s ease;
+        }
+
+        .form-field textarea,
+        .category-form textarea {
+            min-height: 85px;
+            resize: vertical;
+            line-height: 1.6;
         }
 
         .form-field input:focus,
-        .form-field select:focus {
-            border-color: #98704E;
-            box-shadow: 0 0 0 3px rgba(152,112,78,.12);
+        .form-field select:focus,
+        .form-field textarea:focus,
+        .category-form input:focus,
+        .category-form textarea:focus {
+            border-color: var(--inv-brown);
+            box-shadow: 0 0 0 3px rgba(121,84,58,.09);
+        }
+
+        .field-hint {
+            color: var(--inv-muted);
+            font-size: 9px;
+            line-height: 1.6;
+        }
+
+        .category-form {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .category-form textarea {
+            min-height: 100px;
+            max-height: 220px;
         }
 
         .modal-actions {
             display: flex;
+            flex-wrap: wrap;
             gap: 10px;
-            margin-top: 23px;
-        }
-
-        .secondary-btn {
-            background: #E8DED2;
-            color: #63452F;
-            border: none;
-            border-radius: 8px;
-            padding: 12px 18px;
-            font: inherit;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
+            margin-top: 22px;
         }
 
         .form-message {
-            margin-top: 15px;
-            font-size: 13px;
+            min-height: 18px;
+            margin-top: 13px;
+            font-size: 11px;
             font-weight: 600;
+            line-height: 1.6;
         }
 
-        @media(max-width: 800px) {
+        .form-message.success {
+            color: var(--inv-green);
+        }
+
+        .form-message.error {
+            color: var(--inv-red);
+        }
+
+        /* FOOTER */
+
+        .inventory-footer {
+            padding: 13px 0 5px;
+            text-align: center;
+        }
+
+        .inventory-footer p {
+            margin: 0;
+            color: var(--inv-muted);
+            font-size: 10px;
+            line-height: 1.8;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 1100px) {
             .inventory-page {
-                padding: 18px;
+                padding: 25px;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .inventory-page {
+                padding: 20px;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(2,minmax(0,1fr));
+            }
+
+            .summary-card:last-child {
+                grid-column: 1 / -1;
+            }
+
+            .inventory-card,
+            .category-card {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 550px) {
+            .inventory-page {
+                padding: 15px;
+            }
+
+            .inventory-heading {
+                align-items: flex-start;
+                margin-bottom: 22px;
+            }
+
+            .inventory-heading h1 {
+                font-size: 26px;
+            }
+
+            .header-actions {
+                width: 100%;
+            }
+
+            .header-actions button {
+                flex: 1;
+                min-width: 0;
+                padding: 10px 8px;
+                font-size: 9px;
             }
 
             .summary-grid {
                 grid-template-columns: 1fr;
+                gap: 11px;
             }
 
-            .inventory-card {
-                padding: 18px;
+            .summary-card:last-child {
+                grid-column: auto;
             }
-        }
 
-        @media(max-width: 550px) {
+            .summary-card {
+                padding: 17px;
+            }
+
+            .summary-card h2 {
+                font-size: 26px;
+            }
+
+            .inventory-card,
+            .category-card {
+                padding: 15px;
+                border-radius: 11px;
+            }
+
+            .inventory-card-header h2 {
+                font-size: 14px;
+            }
+
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .toolbar input,
+            .toolbar select {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .category-summary,
+            .category-summary-item {
+                width: 100%;
+            }
+
             .product-form {
                 grid-template-columns: 1fr;
             }
@@ -392,14 +831,77 @@
                 grid-column: auto;
             }
 
-            .inventory-heading h1 {
-                font-size: 28px;
+            .inventory-modal {
+                align-items: flex-start;
+                padding: 12px;
             }
 
-            .modal-content {
+            .inventory-modal .modal-content {
                 padding: 19px;
+                margin: auto 0;
+            }
+
+            .modal-header h2 {
+                font-size: 17px;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+
+            .modal-actions button {
+                width: 100%;
             }
         }
+
+        @media (prefers-reduced-motion: reduce) {
+            .inventory-page *,
+            .inventory-page *::before,
+            .inventory-page *::after {
+                animation-duration: .01ms !important;
+                transition-duration: .01ms !important;
+            }
+        }
+
+        /* =========================================
+   SIDEBAR LOGO - SEDUH SENJA
+========================================= */
+
+.sidebar .brand-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 145px;
+    padding: 15px 18px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    text-decoration: none;
+    background: transparent;
+    box-sizing: border-box;
+}
+
+.sidebar .brand-logo img {
+    display: block;
+    width: 100%;
+    max-width: 250px;
+    height: 125px;
+    object-fit: contain;
+    object-position: center;
+}
+
+/* Tampilan layar kecil */
+@media (max-width: 768px) {
+    .sidebar .brand-logo {
+        min-height: 110px;
+        padding: 10px;
+    }
+
+    .sidebar .brand-logo img {
+        max-width: 190px;
+        height: 95px;
+    }
+}
     </style>
 </head>
 
@@ -408,133 +910,214 @@
 <div class="app">
 
     <!-- SIDEBAR -->
-    <aside class="sidebar">
 
-        <div class="brand">
-            <h1>SEDUH SENJA</h1>
-            <p>COFFEE INVENTORY SYSTEM</p>
-        </div>
+<aside class="sidebar">
 
-        <p class="menu-title">MENU UTAMA</p>
+    <!-- LOGO SEDUH SENJA -->
+   <a href="/" class="sidebar-brand" aria-label="SEDUH SENJA">
+    <img
+        src="/images/logo-seduh-senja.png"
+        alt="Logo SEDUH SENJA"
+    >
+</a>
 
-        <nav class="nav-menu">
+    <p class="menu-title">MENU UTAMA</p>
 
-            <a href="/" class="nav-link">
-                <span class="nav-icon">⌂</span>
-                Dashboard
-            </a>
+    <nav class="nav-menu">
+        <a href="/" class="nav-link">
+            <span class="nav-icon">
+                <i class="fas fa-house"></i>
+            </span>
+            <span>Dashboard</span>
+        </a>
 
-            <a href="/inventory" class="nav-link active">
-                <span class="nav-icon">▦</span>
-                Inventaris
-            </a>
+        <a href="/inventory" class="nav-link active" aria-current="page">
+            <span class="nav-icon">
+                <i class="fas fa-boxes-stacked"></i>
+            </span>
+            <span>Inventaris</span>
+        </a>
 
-            <a href="/stock-in" class="nav-link">
-                <span class="nav-icon">↙</span>
-                Barang Masuk
-            </a>
+        <a href="/stock-in" class="nav-link">
+            <span class="nav-icon">
+                <i class="fas fa-arrow-down"></i>
+            </span>
+            <span>Barang Masuk</span>
+        </a>
 
-            <a href="/stock-out" class="nav-link">
-                <span class="nav-icon">↗</span>
-                Barang Keluar
-            </a>
+        <a href="/stock-out" class="nav-link">
+            <span class="nav-icon">
+                <i class="fas fa-arrow-up"></i>
+            </span>
+            <span>Barang Keluar</span>
+        </a>
+    </nav>
 
-        </nav>
+    <p class="menu-title">LAINNYA</p>
 
-        <p class="menu-title">LAINNYA</p>
+    <nav class="nav-menu">
+        <a href="/suppliers" class="nav-link">
+            <span class="nav-icon">
+                <i class="fas fa-truck"></i>
+            </span>
+            <span>Supplier</span>
+        </a>
 
-        <nav class="nav-menu">
-            <a href="#" class="nav-link">
-                <span class="nav-icon">♙</span>
-                Supplier
-            </a>
+        <a href="/reports" class="nav-link">
+            <span class="nav-icon">
+                <i class="fas fa-chart-column"></i>
+            </span>
+            <span>Laporan</span>
+        </a>
 
-            <a href="#" class="nav-link">
-                <span class="nav-icon">▤</span>
-                Laporan
-            </a>
-        </nav>
+        <a href="/settings" class="nav-link">
+            <span class="nav-icon">
+                <i class="fas fa-gear"></i>
+            </span>
+            <span>Pengaturan</span>
+        </a>
+    </nav>
 
-        <div class="sidebar-footer">
-            SEDUH SENJA<br>
-            Inventory Management System<br>
-            Version 1.0.0
-        </div>
+    <div class="sidebar-footer">
+        SEDUH SENJA<br>
+        Inventory Management System<br>
+        Version 1.0.0
+    </div>
 
-    </aside>
+</aside>
 
     <!-- MAIN CONTENT -->
-    <main class="main-content">
 
+    <main class="main-content">
         <div class="inventory-page">
 
-            <!-- HEADER -->
             <header class="inventory-heading">
-
                 <div>
                     <span class="eyebrow">INVENTORY MANAGEMENT</span>
                     <h1>Manajemen Inventaris</h1>
                     <p>Kelola seluruh persediaan bahan baku dan produk SEDUH SENJA.</p>
                 </div>
 
-                <button class="primary-btn" id="addProductBtn" type="button">
-                    + Tambah Produk
-                </button>
+                <div class="header-actions">
+                    <button class="secondary-btn" id="manageCategoryBtn"
+                        type="button" aria-expanded="false" aria-controls="categoryCard">
+                        <i class="fas fa-tags"></i>
+                        Kelola Kategori
+                    </button>
 
+                    <button class="primary-btn" id="addProductBtn" type="button">
+                        <i class="fas fa-plus"></i>
+                        Tambah Produk
+                    </button>
+                </div>
             </header>
 
-            <!-- SUMMARY -->
-            <section class="summary-grid">
+            <!-- STATISTICS -->
+
+            <section class="summary-grid" aria-label="Statistik inventaris">
 
                 <div class="summary-card">
-                    <div class="summary-icon">📦</div>
+                    <div class="summary-icon"><i class="fas fa-box"></i></div>
                     <span>Total Produk Aktif</span>
                     <h2 id="totalProducts">0</h2>
                 </div>
 
                 <div class="summary-card">
-                    <div class="summary-icon">☕</div>
+                    <div class="summary-icon"><i class="fas fa-cubes"></i></div>
                     <span>Total Stok Produk</span>
                     <h2 id="totalStock">0</h2>
                 </div>
 
                 <div class="summary-card">
-                    <div class="summary-icon">⚠️</div>
+                    <div class="summary-icon"><i class="fas fa-triangle-exclamation"></i></div>
                     <span>Produk Stok Menipis</span>
                     <h2 id="lowStockProducts">0</h2>
                 </div>
 
             </section>
 
-            <!-- INVENTORY TABLE -->
+            <!-- CATEGORY MANAGEMENT -->
+
+            <section class="category-card" id="categoryCard" aria-label="Manajemen kategori">
+
+                <div class="inventory-card-header">
+                    <div>
+                        <h2><i class="fas fa-tags"></i>Manajemen Kategori</h2>
+                        <p class="section-description">
+                            Tambahkan, ubah, dan kelola kategori produk SEDUH SENJA.
+                        </p>
+                    </div>
+
+                    <button class="primary-btn" id="addCategoryBtn" type="button">
+                        <i class="fas fa-plus"></i>
+                        Tambah Kategori
+                    </button>
+                </div>
+
+                <div class="category-summary">
+                    <div class="category-summary-item">
+                        <span>Total Kategori</span>
+                        <strong id="totalCategories">0</strong>
+                    </div>
+                </div>
+
+                <div class="table-wrap">
+                    <table class="category-table">
+                        <thead>
+                            <tr>
+                                <th style="width:60px">NO</th>
+                                <th>NAMA KATEGORI</th>
+                                <th>JUMLAH PRODUK</th>
+                                <th style="width:150px">AKSI</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoryTable">
+                            <tr>
+                                <td colspan="4" class="empty-state">Memuat kategori...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p class="category-message" id="categoryMessage"
+                    role="status" aria-live="polite"></p>
+
+            </section>
+
+            <!-- PRODUCT TABLE -->
+
             <section class="inventory-card">
 
                 <div class="inventory-card-header">
-                    <h2>Daftar Inventaris</h2>
+                    <div>
+                        <h2><i class="fas fa-boxes-stacked"></i>Daftar Inventaris</h2>
+                        <p class="section-description">
+                            Daftar seluruh produk dan kondisi persediaan saat ini.
+                        </p>
+                    </div>
+
                     <span id="productCount">0 produk</span>
                 </div>
 
                 <div class="toolbar">
-
-                    <input
-                        type="search"
-                        id="searchProduct"
+                    <input type="search" id="searchProduct"
                         placeholder="Cari kode atau nama produk..."
-                    >
+                        aria-label="Cari produk">
 
-                    <select id="filterStatus">
+                    <select id="filterCategory" aria-label="Filter kategori">
+                        <option value="all">Semua Kategori</option>
+                    </select>
+
+                    <select id="filterStatus" aria-label="Filter status stok">
                         <option value="all">Semua Status</option>
                         <option value="safe">Stok Aman</option>
                         <option value="low">Stok Menipis</option>
                         <option value="empty">Stok Habis</option>
                     </select>
-
                 </div>
 
                 <div class="table-wrap">
-
                     <table class="inventory-table">
-
                         <thead>
                             <tr>
                                 <th>KODE</th>
@@ -548,86 +1131,77 @@
                         </thead>
 
                         <tbody id="productTable">
-
                             <tr>
-                                <td colspan="7" class="empty-state">
-                                    Memuat data produk...
-                                </td>
+                                <td colspan="7" class="empty-state">Memuat data produk...</td>
                             </tr>
-
                         </tbody>
-
                     </table>
-
                 </div>
 
-                <p class="connection-status" id="connectionStatus" role="status">
+                <p class="connection-status" id="connectionStatus"
+                    role="status" aria-live="polite">
+                    <i class="fas fa-circle-notch fa-spin"></i>
                     Menghubungkan ke database...
                 </p>
 
             </section>
 
-            <footer style="text-align:center;padding:20px 0">
-                <p class="connection-status">
-                    © 2026 SEDUH SENJA — Coffee Inventory Management System
+            <footer class="inventory-footer">
+                <p>
+                    © 2026 SEDUH SENJA<br>
+                    Coffee Inventory Management System
                 </p>
             </footer>
 
         </div>
-
     </main>
-
 </div>
 
-<!-- MODAL TAMBAH / EDIT PRODUK -->
-<div class="modal" id="productModal">
+<!-- PRODUCT MODAL -->
+
+<div class="inventory-modal" id="productModal"
+    role="dialog" aria-modal="true"
+    aria-labelledby="modalTitle" aria-hidden="true">
 
     <div class="modal-content">
 
         <div class="modal-header">
-            <h2 id="modalTitle">Tambah Produk Baru</h2>
+            <div>
+                <span class="modal-eyebrow">SEDUH SENJA INVENTORY</span>
+                <h2 id="modalTitle">Tambah Produk Baru</h2>
+            </div>
 
-            <button
-                type="button"
-                class="close-modal"
-                id="closeModal"
-                aria-label="Tutup"
-            >
-                &times;
-            </button>
+            <button type="button" class="close-modal" id="closeModal"
+                aria-label="Tutup modal">&times;</button>
         </div>
 
         <form id="productForm">
-
             <input type="hidden" id="productId">
 
             <div class="product-form">
 
                 <div class="form-field">
                     <label for="productCode">Kode Produk *</label>
-                    <input
-                        type="text"
-                        id="productCode"
-                        placeholder="Contoh: SS001"
-                        required
-                    >
+                    <input type="text" id="productCode"
+                        placeholder="Contoh: SS001" maxlength="50"
+                        autocomplete="off" required>
                 </div>
 
                 <div class="form-field">
                     <label for="productName">Nama Produk *</label>
-                    <input
-                        type="text"
-                        id="productName"
+                    <input type="text" id="productName"
                         placeholder="Contoh: Biji Kopi Arabika"
-                        required
-                    >
+                        maxlength="150" required>
                 </div>
 
                 <div class="form-field">
-                    <label for="productCategory">Kategori *</label>
-                    <select id="productCategory" required>
-                        <option value="">Pilih kategori</option>
+                    <label for="productCategory">Kategori</label>
+                    <select id="productCategory">
+                        <option value="">Tanpa Kategori</option>
                     </select>
+                    <small class="field-hint">
+                        Pilih kategori produk atau biarkan kosong.
+                    </small>
                 </div>
 
                 <div class="form-field">
@@ -645,61 +1219,117 @@
                     </select>
                 </div>
 
-                <div class="form-field">
+                <div class="form-field" id="initialStockField">
                     <label for="productStock">Stok Awal *</label>
-                    <input
-                        type="number"
-                        id="productStock"
-                        min="0"
-                        step="0.01"
-                        value="0"
-                        required
-                    >
+                    <input type="number" id="productStock"
+                        min="0" step="0.01" value="0" required>
+                    <small class="field-hint">
+                        Stok awal hanya ditentukan saat menambahkan produk.
+                    </small>
                 </div>
 
                 <div class="form-field">
                     <label for="productMinimum">Stok Minimum *</label>
-                    <input
-                        type="number"
-                        id="productMinimum"
-                        min="0"
-                        step="0.01"
-                        value="5"
-                        required
-                    >
+                    <input type="number" id="productMinimum"
+                        min="0" step="0.01" value="5" required>
+                </div>
+
+                <div class="form-field full">
+                    <label for="productPrice">Harga Beli (Rp)</label>
+                    <input type="number" id="productPrice"
+                        min="0" step="1" value="0"
+                        placeholder="Contoh: 25000">
+                    <small class="field-hint">
+                        Masukkan harga pembelian produk dalam rupiah.
+                    </small>
+                </div>
+
+                <div class="form-field full">
+                    <label for="productDescription">Deskripsi Produk</label>
+                    <textarea id="productDescription"
+                        maxlength="1000"
+                        placeholder="Tambahkan informasi produk jika diperlukan..."></textarea>
+                    <small class="field-hint">Maksimal 1000 karakter.</small>
                 </div>
 
             </div>
 
             <div class="modal-actions">
-
-                <button
-                    type="submit"
-                    class="primary-btn"
-                    id="saveProductBtn"
-                >
+                <button type="submit" class="primary-btn" id="saveProductBtn">
+                    <i class="fas fa-save"></i>
                     Simpan Produk
                 </button>
 
-                <button
-                    type="button"
-                    class="secondary-btn"
-                    id="cancelModal"
-                >
+                <button type="button" class="secondary-btn" id="cancelModal">
                     Batal
                 </button>
-
             </div>
 
-            <p id="formMessage" class="form-message" role="status"></p>
-
+            <p id="formMessage" class="form-message"
+                role="status" aria-live="polite"></p>
         </form>
-
     </div>
-
 </div>
 
-<script src="/js/inventory.js"></script>
+<!-- CATEGORY MODAL -->
+
+<div class="inventory-modal" id="categoryModal"
+    role="dialog" aria-modal="true"
+    aria-labelledby="categoryModalTitle" aria-hidden="true">
+
+    <div class="modal-content category-modal-content">
+
+        <div class="modal-header">
+            <div>
+                <span class="modal-eyebrow">SEDUH SENJA INVENTORY</span>
+                <h2 id="categoryModalTitle">Tambah Kategori</h2>
+            </div>
+
+            <button type="button" class="close-modal"
+                id="closeCategoryModal" aria-label="Tutup modal">&times;</button>
+        </div>
+
+        <form id="categoryForm">
+            <input type="hidden" id="categoryId">
+
+            <div class="category-form">
+                <label for="categoryName">Nama Kategori *</label>
+                <input type="text" id="categoryName"
+                    placeholder="Contoh: Coffee, Non Coffee, Snack"
+                    maxlength="50" autocomplete="off" required>
+
+                <small class="field-hint">
+                    Nama kategori maksimal 50 karakter.
+                </small>
+
+                <label for="categoryDescription">Deskripsi Kategori</label>
+                <textarea id="categoryDescription"
+                    maxlength="500"
+                    placeholder="Jelaskan kategori produk..."></textarea>
+
+                <small class="field-hint">Maksimal 500 karakter.</small>
+            </div>
+
+            <div class="modal-actions">
+                <button type="submit" class="primary-btn" id="saveCategoryBtn">
+                    <i class="fas fa-save"></i>
+                    Simpan Kategori
+                </button>
+
+                <button type="button" class="secondary-btn"
+                    id="cancelCategoryModal">
+                    Batal
+                </button>
+            </div>
+
+            <p id="categoryFormMessage" class="form-message"
+                role="status" aria-live="polite"></p>
+        </form>
+    </div>
+</div>
+
+<script src="/js/inventory.js" defer></script>
+<script src="/js/sidebar.js" defer></script>
 
 </body>
 </html>

@@ -13,37 +13,64 @@ const db = require("./config/database");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.disable("x-powered-by");
+
 // ==========================================
 // 2. MIDDLEWARE
 // ==========================================
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "1mb" }));
+
+app.use(express.urlencoded({
+    extended: true,
+    limit: "1mb"
+}));
 
 // Folder public
-app.use(express.static(path.join(__dirname, "public")));
+const publicFolder = path.join(__dirname, "public");
+
+app.use(express.static(publicFolder));
 
 // ==========================================
 // 3. FUNGSI IMPORT ROUTES
 // ==========================================
 
 // Route wajib
-function loadRoute(fileName) {
-    const routePath = path.join(__dirname, "routes", fileName);
+function loadRoute(fileNames) {
+    const names = Array.isArray(fileNames)
+        ? fileNames
+        : [fileNames];
 
-    if (!fs.existsSync(routePath)) {
-        throw new Error(`Route tidak ditemukan: routes/${fileName}`);
+    for (const fileName of names) {
+        const routePath = path.join(
+            __dirname,
+            "routes",
+            fileName
+        );
+
+        if (fs.existsSync(routePath)) {
+            console.log(`[ROUTE] Loaded: ${fileName}`);
+            return require(routePath);
+        }
     }
 
-    return require(routePath);
+    throw new Error(
+        `Route tidak ditemukan: ${names.join(" / ")}`
+    );
 }
 
 // Route opsional
 function loadOptionalRoute(fileName) {
-    const routePath = path.join(__dirname, "routes", fileName);
+    const routePath = path.join(
+        __dirname,
+        "routes",
+        fileName
+    );
 
     if (!fs.existsSync(routePath)) {
-        console.warn(`[WARNING] routes/${fileName} belum tersedia.`);
+        console.warn(
+            `[WARNING] routes/${fileName} belum tersedia.`
+        );
 
         const router = express.Router();
 
@@ -57,6 +84,8 @@ function loadOptionalRoute(fileName) {
         return router;
     }
 
+    console.log(`[ROUTE] Loaded: ${fileName}`);
+
     return require(routePath);
 }
 
@@ -65,36 +94,80 @@ function loadOptionalRoute(fileName) {
 // ==========================================
 
 const productRoutes = loadRoute("products.js");
-const supplierRoutes = loadRoute("suppliers.js");
+
+const categoryRoutes = loadRoute("categories.js");
+
+const supplierRoutes = loadRoute([
+    "supplier.js",
+    "suppliers.js"
+]);
+
 const stockInRoutes = loadRoute("stockin.js");
-const stockOutRoutes = loadOptionalRoute("stockOut.js");
+
+const stockOutRoutes = loadOptionalRoute(
+    "stockOut.js"
+);
+
+const reportsRoutes = loadRoute("reports.js");
 
 // ==========================================
-// 5. HALAMAN WEBSITE
+// 5. HELPER HALAMAN WEBSITE
 // ==========================================
 
-// Dashboard
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
-});
+function sendPage(fileName) {
+    return (req, res, next) => {
+        const filePath = path.join(
+            publicFolder,
+            fileName
+        );
 
-// Inventaris
-app.get("/inventory", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "inventory.html"));
-});
+        if (!fs.existsSync(filePath)) {
+            console.error(
+                `[PAGE ERROR] File tidak ditemukan: ${fileName}`
+            );
 
-// Barang masuk
-app.get("/stock-in", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "stock-in.html"));
-});
+            return res.status(404).send(`
+                <h2>Halaman tidak ditemukan</h2>
+                <p>File ${fileName} tidak tersedia di folder public.</p>
+                <a href="/">Kembali ke Dashboard</a>
+            `);
+        }
 
-// Barang keluar
-app.get("/stock-out", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "stock-out.html"));
-});
+        res.sendFile(filePath, (error) => {
+            if (error && !res.headersSent) {
+                next(error);
+            }
+        });
+    };
+}
 
 // ==========================================
-// 6. API STATUS SERVER
+// 6. HALAMAN WEBSITE
+// ==========================================
+
+// DASHBOARD
+app.get("/", sendPage("index.html"));
+
+// INVENTARIS
+app.get("/inventory", sendPage("inventory.html"));
+
+// BARANG MASUK
+app.get("/stock-in", sendPage("stock-in.html"));
+
+// BARANG KELUAR
+app.get("/stock-out", sendPage("stock-out.html"));
+
+// SUPPLIER
+app.get("/suppliers", sendPage("supplier.html"));
+
+// LAPORAN
+app.get("/reports", sendPage("reports.html"));
+
+// PENGATURAN
+app.get("/settings", sendPage("settings.html"));
+
+// ==========================================
+// 7. API STATUS SERVER
 // ==========================================
 
 app.get("/api/status", (req, res) => {
@@ -110,7 +183,7 @@ app.get("/api/status", (req, res) => {
         });
 
     } catch (error) {
-        console.error("Status error:", error);
+        console.error("[STATUS ERROR]", error);
 
         res.status(500).json({
             success: false,
@@ -121,7 +194,7 @@ app.get("/api/status", (req, res) => {
 });
 
 // ==========================================
-// 7. API DASHBOARD
+// 8. API DASHBOARD
 // ==========================================
 
 app.get("/api/dashboard", (req, res) => {
@@ -200,7 +273,7 @@ app.get("/api/dashboard", (req, res) => {
         });
 
     } catch (error) {
-        console.error("Dashboard error:", error);
+        console.error("[DASHBOARD ERROR]", error);
 
         res.status(500).json({
             success: false,
@@ -210,23 +283,29 @@ app.get("/api/dashboard", (req, res) => {
 });
 
 // ==========================================
-// 8. API ROUTES
+// 9. API ROUTES
 // ==========================================
 
-// Produk
+// PRODUK
 app.use("/api/products", productRoutes);
 
-// Supplier
+// KATEGORI
+app.use("/api/categories", categoryRoutes);
+
+// SUPPLIER
 app.use("/api/suppliers", supplierRoutes);
 
-// Barang masuk
+// BARANG MASUK
 app.use("/api/stock-in", stockInRoutes);
 
-// Barang keluar
+// BARANG KELUAR
 app.use("/api/stock-out", stockOutRoutes);
 
+// LAPORAN INVENTARIS
+app.use("/api/reports", reportsRoutes);
+
 // ==========================================
-// 9. API TIDAK DITEMUKAN
+// 10. API TIDAK DITEMUKAN
 // ==========================================
 
 app.use("/api", (req, res) => {
@@ -237,7 +316,24 @@ app.use("/api", (req, res) => {
 });
 
 // ==========================================
-// 10. HALAMAN TIDAK DITEMUKAN
+// 11. ERROR HANDLER
+// ==========================================
+
+app.use((error, req, res, next) => {
+    console.error("[SERVER ERROR]", error);
+
+    if (res.headersSent) {
+        return next(error);
+    }
+
+    res.status(500).json({
+        success: false,
+        message: "Terjadi kesalahan pada server."
+    });
+});
+
+// ==========================================
+// 12. HALAMAN TIDAK DITEMUKAN
 // ==========================================
 
 app.use((req, res) => {
@@ -307,7 +403,11 @@ app.use((req, res) => {
             <div class="error-container">
                 <h1>404</h1>
                 <h2>Halaman Tidak Ditemukan</h2>
-                <p>Maaf, halaman yang kamu cari tidak tersedia.</p>
+                <p>
+                    Maaf, halaman yang kamu cari
+                    tidak tersedia.
+                </p>
+
                 <a href="/">Kembali ke Dashboard</a>
             </div>
         </body>
@@ -316,38 +416,40 @@ app.use((req, res) => {
 });
 
 // ==========================================
-// 11. ERROR HANDLER
-// ==========================================
-
-app.use((error, req, res, next) => {
-    console.error("Server error:", error);
-
-    if (res.headersSent) {
-        return next(error);
-    }
-
-    res.status(500).json({
-        success: false,
-        message: "Terjadi kesalahan pada server."
-    });
-});
-
-// ==========================================
-// 12. MENJALANKAN SERVER
+// 13. MENJALANKAN SERVER
 // ==========================================
 
 app.listen(PORT, () => {
+
     console.log("");
+
     console.log("======================================");
     console.log("       SEDUH SENJA INVENTORY SYSTEM");
     console.log("======================================");
+
     console.log("Status       : Server Aktif");
     console.log(`Port         : ${PORT}`);
-    console.log(`Website      : http://localhost:${PORT}`);
+
+    console.log("");
+    console.log("HALAMAN WEBSITE");
+
     console.log(`Dashboard    : http://localhost:${PORT}/`);
     console.log(`Inventory    : http://localhost:${PORT}/inventory`);
     console.log(`Barang Masuk : http://localhost:${PORT}/stock-in`);
     console.log(`Barang Keluar: http://localhost:${PORT}/stock-out`);
+    console.log(`Supplier     : http://localhost:${PORT}/suppliers`);
+    console.log(`Laporan      : http://localhost:${PORT}/reports`);
+    console.log(`Pengaturan   : http://localhost:${PORT}/settings`);
+
+    console.log("");
+    console.log("API");
+
+    console.log(`Status       : http://localhost:${PORT}/api/status`);
+    console.log(`Products     : http://localhost:${PORT}/api/products`);
+    console.log(`Categories   : http://localhost:${PORT}/api/categories`);
+    console.log(`Suppliers    : http://localhost:${PORT}/api/suppliers`);
+    console.log(`Reports      : http://localhost:${PORT}/api/reports`);
+
     console.log("======================================");
     console.log("");
 });

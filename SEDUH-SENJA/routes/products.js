@@ -6,7 +6,7 @@ const db = require("../config/database");
 const router = express.Router();
 
 // ==========================================
-// HELPER VALIDASI
+// 1. HELPER VALIDASI
 // ==========================================
 
 function isValidText(value, maxLength) {
@@ -41,8 +41,15 @@ function parseCategoryId(value) {
     return id;
 }
 
+function hasField(object, field) {
+    return Object.prototype.hasOwnProperty.call(object, field);
+}
+
 function isUniqueError(error) {
-    return error.code === "SQLITE_CONSTRAINT_UNIQUE";
+    return (
+        error.code === "SQLITE_CONSTRAINT_UNIQUE" ||
+        error.code === "SQLITE_CONSTRAINT_PRIMARYKEY"
+    );
 }
 
 function handleError(res, error, message) {
@@ -65,12 +72,25 @@ function validateCategory(categoryId) {
     if (categoryId === null) return true;
 
     return !!db.prepare(`
-        SELECT id FROM categories WHERE id = ?
+        SELECT id
+        FROM categories
+        WHERE id = ?
     `).get(categoryId);
 }
 
+function validateDescription(description) {
+    if (description === undefined || description === null) {
+        return true;
+    }
+
+    return (
+        typeof description === "string" &&
+        description.trim().length <= 1000
+    );
+}
+
 // ==========================================
-// 1. MENGAMBIL SELURUH PRODUK
+// 2. GET SELURUH PRODUK AKTIF
 // ==========================================
 
 router.get("/", (req, res) => {
@@ -88,6 +108,7 @@ router.get("/", (req, res) => {
                 p.minimum_stock,
                 p.purchase_price,
                 p.description,
+                p.is_archived,
                 p.created_at
             FROM products p
             LEFT JOIN categories c
@@ -111,7 +132,7 @@ router.get("/", (req, res) => {
 });
 
 // ==========================================
-// 2. MENAMBAHKAN PRODUK
+// 3. POST TAMBAH PRODUK
 // ==========================================
 
 router.post("/", (req, res) => {
@@ -127,7 +148,6 @@ router.post("/", (req, res) => {
             description
         } = req.body;
 
-        // Validasi teks
         if (
             !isValidText(code, 50) ||
             !isValidText(name, 150) ||
@@ -135,29 +155,17 @@ router.post("/", (req, res) => {
         ) {
             return res.status(400).json({
                 success: false,
-                message: "Kode, nama, dan satuan wajib diisi dengan format yang benar."
+                message: "Kode, nama, dan satuan wajib diisi."
             });
         }
 
-        if (
-            description !== undefined &&
-            description !== null &&
-            typeof description !== "string"
-        ) {
+        if (!validateDescription(description)) {
             return res.status(400).json({
                 success: false,
-                message: "Format deskripsi tidak valid."
+                message: "Deskripsi maksimal 1000 karakter dan harus berupa teks."
             });
         }
 
-        if (description && description.length > 1000) {
-            return res.status(400).json({
-                success: false,
-                message: "Deskripsi maksimal 1000 karakter."
-            });
-        }
-
-        // Validasi angka
         const stock = parseNumber(initial_stock);
         const minimum = parseNumber(minimum_stock);
         const price = parseNumber(purchase_price);
@@ -173,7 +181,6 @@ router.post("/", (req, res) => {
             });
         }
 
-        // Validasi kategori
         const categoryId = parseCategoryId(category_id);
 
         if (categoryId === undefined) {
@@ -195,8 +202,9 @@ router.post("/", (req, res) => {
         const cleanUnit = unit.trim();
         const cleanDescription = description?.trim() || null;
 
-        // Transaksi database
+        // Produk dan stok awal dibuat dalam satu transaksi.
         const createProduct = db.transaction(() => {
+
             const result = db.prepare(`
                 INSERT INTO products (
                     code,
@@ -224,7 +232,7 @@ router.post("/", (req, res) => {
 
             const productId = Number(result.lastInsertRowid);
 
-            // Catat stok awal jika jumlahnya lebih dari nol
+            // Catat stok awal ke riwayat transaksi.
             if (stock > 0) {
                 db.prepare(`
                     INSERT INTO stock_transactions (
@@ -270,7 +278,7 @@ router.post("/", (req, res) => {
 });
 
 // ==========================================
-// 3. MENGEDIT INFORMASI PRODUK
+// 4. PUT EDIT PRODUK
 // ==========================================
 
 router.put("/:id", (req, res) => {
@@ -288,13 +296,9 @@ router.put("/:id", (req, res) => {
             code,
             name,
             category_id,
-            unit,
-            minimum_stock,
-            purchase_price,
-            description
+            unit
         } = req.body;
 
-        // Validasi teks
         if (
             !isValidText(code, 50) ||
             !isValidText(name, 150) ||
@@ -306,27 +310,30 @@ router.put("/:id", (req, res) => {
             });
         }
 
-        if (
-            description !== undefined &&
-            description !== null &&
-            typeof description !== "string"
-        ) {
-            return res.status(400).json({
+        // Ambil data lengkap produk lama.
+        const existingProduct = db.prepare(`
+            SELECT *
+            FROM products
+            WHERE id = ?
+              AND is_archived = 0
+        `).get(id);
+
+        if (!existingProduct) {
+            return res.status(404).json({
                 success: false,
-                message: "Format deskripsi tidak valid."
+                message: "Produk tidak ditemukan atau sudah diarsipkan."
             });
         }
 
-        if (description && description.length > 1000) {
-            return res.status(400).json({
-                success: false,
-                message: "Deskripsi maksimal 1000 karakter."
-            });
-        }
+        // Pertahankan stok minimum jika tidak dikirim.
+        const minimum = hasField(req.body, "minimum_stock")
+            ? parseNumber(req.body.minimum_stock)
+            : Number(existingProduct.minimum_stock);
 
-        // Validasi angka
-        const minimum = parseNumber(minimum_stock);
-        const price = parseNumber(purchase_price);
+        // Pertahankan harga lama jika tidak dikirim.
+        const price = hasField(req.body, "purchase_price")
+            ? parseNumber(req.body.purchase_price)
+            : Number(existingProduct.purchase_price);
 
         if (
             minimum === null || minimum < 0 ||
@@ -338,8 +345,10 @@ router.put("/:id", (req, res) => {
             });
         }
 
-        // Validasi kategori
-        const categoryId = parseCategoryId(category_id);
+        // Pertahankan kategori lama jika tidak dikirim.
+        const categoryId = hasField(req.body, "category_id")
+            ? parseCategoryId(category_id)
+            : existingProduct.category_id;
 
         if (categoryId === undefined) {
             return res.status(400).json({
@@ -355,6 +364,27 @@ router.put("/:id", (req, res) => {
             });
         }
 
+        // Pertahankan deskripsi lama jika tidak dikirim.
+        const description = hasField(req.body, "description")
+            ? req.body.description
+            : existingProduct.description;
+
+        if (!validateDescription(description)) {
+            return res.status(400).json({
+                success: false,
+                message: "Deskripsi maksimal 1000 karakter dan harus berupa teks."
+            });
+        }
+
+        const cleanDescription =
+            typeof description === "string"
+                ? (description.trim() || null)
+                : null;
+
+        // PENTING:
+        // stock dan initial_stock sengaja tidak dimasukkan
+        // ke dalam UPDATE agar riwayat transaksi tetap aman.
+
         const result = db.prepare(`
             UPDATE products
             SET
@@ -366,7 +396,7 @@ router.put("/:id", (req, res) => {
                 purchase_price = ?,
                 description = ?
             WHERE id = ?
-            AND is_archived = 0
+              AND is_archived = 0
         `).run(
             code.trim(),
             name.trim(),
@@ -374,14 +404,14 @@ router.put("/:id", (req, res) => {
             unit.trim(),
             minimum,
             price,
-            description?.trim() || null,
+            cleanDescription,
             id
         );
 
         if (result.changes === 0) {
             return res.status(404).json({
                 success: false,
-                message: "Produk tidak ditemukan atau sudah diarsipkan."
+                message: "Produk gagal diperbarui."
             });
         }
 
@@ -400,7 +430,7 @@ router.put("/:id", (req, res) => {
 });
 
 // ==========================================
-// 4. MENGARSIPKAN PRODUK
+// 5. PATCH ARSIP PRODUK
 // ==========================================
 
 router.patch("/:id/archive", (req, res) => {
@@ -415,6 +445,7 @@ router.patch("/:id/archive", (req, res) => {
         }
 
         const archiveProduct = db.transaction(() => {
+
             const product = db.prepare(`
                 SELECT id, stock, is_archived
                 FROM products
@@ -422,26 +453,21 @@ router.patch("/:id/archive", (req, res) => {
             `).get(id);
 
             if (!product || product.is_archived === 1) {
-                return {
-                    status: "NOT_FOUND"
-                };
+                return { status: "NOT_FOUND" };
             }
 
             if (Number(product.stock) > 0) {
-                return {
-                    status: "HAS_STOCK"
-                };
+                return { status: "HAS_STOCK" };
             }
 
             db.prepare(`
                 UPDATE products
                 SET is_archived = 1
                 WHERE id = ?
+                  AND is_archived = 0
             `).run(id);
 
-            return {
-                status: "SUCCESS"
-            };
+            return { status: "SUCCESS" };
         });
 
         const result = archiveProduct();
@@ -456,7 +482,7 @@ router.patch("/:id/archive", (req, res) => {
         if (result.status === "HAS_STOCK") {
             return res.status(400).json({
                 success: false,
-                message: "Produk masih memiliki stok. Kosongkan stok sebelum mengarsipkan."
+                message: "Produk masih memiliki stok. Kosongkan stok melalui transaksi sebelum mengarsipkan."
             });
         }
 
@@ -475,7 +501,12 @@ router.patch("/:id/archive", (req, res) => {
 });
 
 // ==========================================
-// EXPORT ROUTER
+// 6. EXPORT ROUTER
 // ==========================================
 
 module.exports = router;
+
+// ==========================================
+// END PRODUCTS ROUTES
+// SEDUH SENJA VERSION 5.1
+// ==========================================

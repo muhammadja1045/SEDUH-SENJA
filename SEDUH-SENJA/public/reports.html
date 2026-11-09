@@ -1,0 +1,1245 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#241A16">
+
+    <title>Laporan Inventaris | SEDUH SENJA</title>
+
+    <!-- GOOGLE FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- MAIN STYLESHEET -->
+    <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        /* ==================================================
+           SEDUH SENJA - REPORT PAGE
+           VERSION 3.0
+        ================================================== */
+
+        :root {
+            --report-brown: #79543A;
+            --report-dark: #30221B;
+            --report-gold: #B98255;
+            --report-cream: #F8F4EE;
+            --report-background: #F7F5F0;
+            --report-text: #30221B;
+            --report-muted: #A18E7E;
+            --report-border: #E7DDD2;
+            --report-green: #287A4C;
+            --report-red: #B83C2D;
+
+            --font-heading: 'DM Serif Display', serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        /* ==================================================
+           BASE
+        ================================================== */
+
+        .report-content,
+        .report-content * {
+            box-sizing: border-box;
+        }
+
+        .report-content {
+            width: 100%;
+            min-width: 0;
+            padding: 35px;
+            font-family: var(--font-body);
+            color: var(--report-text);
+        }
+
+        .report-content button,
+        .report-content input,
+        .report-content select,
+        .report-content textarea {
+            font-family: var(--font-body);
+        }
+
+        /* ==================================================
+           PAGE HEADER
+        ================================================== */
+
+        .report-header {
+            margin-bottom: 30px;
+        }
+
+        .report-label {
+            display: inline-block;
+            margin-bottom: 12px;
+            color: var(--report-gold);
+            font-family: var(--font-body);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .report-header h1 {
+            margin: 0 0 13px;
+            color: var(--report-dark);
+            font-family: var(--font-heading);
+            font-size: 42px;
+            font-weight: 400;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+        }
+
+        .report-header p {
+            margin: 0;
+            color: var(--report-muted);
+            font-family: var(--font-body);
+            font-size: 15px;
+            font-weight: 400;
+            line-height: 1.7;
+        }
+
+        /* ==================================================
+           STATISTICS
+        ================================================== */
+
+        .report-cards {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .report-stat {
+            position: relative;
+            min-width: 0;
+            overflow: hidden;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,.06);
+            border-radius: 18px;
+            background: linear-gradient(
+                145deg,
+                #3B2A20,
+                #251A15
+            );
+            color: #F7EADB;
+        }
+
+        .report-stat::after {
+            position: absolute;
+            top: -25px;
+            right: -25px;
+            width: 95px;
+            height: 95px;
+            border-radius: 50%;
+            background: rgba(185,130,85,.10);
+            content: "";
+            pointer-events: none;
+        }
+
+        .stat-icon {
+            position: relative;
+            z-index: 1;
+            margin-bottom: 22px;
+            font-size: 24px;
+        }
+
+        .report-stat span {
+            display: block;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 10px;
+            color: #C5B5A6;
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .report-stat strong {
+            display: block;
+            position: relative;
+            z-index: 1;
+            color: #F7EADB;
+            font-family: var(--font-heading);
+            font-size: 36px;
+            font-weight: 400;
+            line-height: 1.2;
+            overflow-wrap: anywhere;
+        }
+
+        /* ==================================================
+           PANEL
+        ================================================== */
+
+        .report-panel {
+            min-width: 0;
+            margin-bottom: 24px;
+            padding: 25px;
+            border: 1px solid rgba(48,34,27,.025);
+            border-radius: 18px;
+            background: var(--report-cream);
+            box-shadow: 0 8px 30px rgba(40,25,15,.055);
+        }
+
+        .panel-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 23px;
+        }
+
+        .panel-heading h2 {
+            margin: 0;
+            color: var(--report-dark);
+            font-family: var(--font-heading);
+            font-size: 25px;
+            font-weight: 400;
+            line-height: 1.3;
+        }
+
+        .panel-subtitle {
+            margin-top: 7px;
+            color: var(--report-muted);
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 400;
+            line-height: 1.6;
+        }
+
+        .panel-icon {
+            flex-shrink: 0;
+            font-size: 24px;
+        }
+
+        /* ==================================================
+           ANALYTICS
+        ================================================== */
+
+        .report-analytics {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            align-items: stretch;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .report-analytics .report-panel {
+            margin-bottom: 0;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 320px;
+            min-width: 0;
+        }
+
+        .chart-container canvas {
+            max-width: 100%;
+        }
+
+        /* ==================================================
+           TOP PRODUCTS
+        ================================================== */
+
+        .top-product-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 17px 0;
+            border-bottom: 1px solid var(--report-border);
+        }
+
+        .top-product-item:last-child {
+            border-bottom: none;
+        }
+
+        .top-product-rank {
+            display: flex;
+            flex-shrink: 0;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: #EEE2D4;
+            color: var(--report-brown);
+            font-family: var(--font-body);
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .top-product-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .top-product-info strong {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--report-text);
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        .top-product-info small {
+            color: var(--report-muted);
+            font-family: var(--font-body);
+            font-size: 12px;
+        }
+
+        .top-product-quantity {
+            flex-shrink: 0;
+            color: var(--report-brown);
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        /* ==================================================
+           EMPTY STATE
+        ================================================== */
+
+        .report-empty {
+            padding: 30px 15px;
+            color: var(--report-muted);
+            font-family: var(--font-body);
+            font-size: 13px;
+            text-align: center;
+        }
+
+        /* ==================================================
+           INVENTORY SUMMARY
+        ================================================== */
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .inventory-card {
+            min-width: 0;
+            padding: 23px;
+            border-radius: 15px;
+            background: linear-gradient(
+                145deg,
+                #3B2A20,
+                #251A15
+            );
+            color: #F7EADB;
+        }
+
+        .inventory-icon {
+            margin-bottom: 15px;
+            font-size: 23px;
+        }
+
+        .inventory-card small {
+            display: block;
+            margin-bottom: 12px;
+            color: #C5B5A6;
+            font-family: var(--font-body);
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .inventory-card strong {
+            display: block;
+            color: #F7EADB;
+            font-family: var(--font-heading);
+            font-size: 30px;
+            font-weight: 400;
+            line-height: 1.2;
+            overflow-wrap: anywhere;
+        }
+
+        /* ==================================================
+           FILTER
+        ================================================== */
+
+        .report-filters {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            align-items: end;
+            gap: 15px;
+        }
+
+        .report-field {
+            min-width: 0;
+        }
+
+        .report-field label {
+            display: block;
+            margin-bottom: 9px;
+            color: #594333;
+            font-family: var(--font-body);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .report-field input,
+        .report-field select {
+            width: 100%;
+            min-height: 46px;
+            padding: 11px 12px;
+            border: 1px solid #DFD1C2;
+            border-radius: 9px;
+            outline: none;
+            background: #FFFFFF;
+            color: var(--report-text);
+            font-family: var(--font-body);
+            font-size: 13px;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .report-field input:focus,
+        .report-field select:focus {
+            border-color: var(--report-gold);
+            box-shadow: 0 0 0 3px rgba(185,130,85,.12);
+        }
+
+        /* ==================================================
+           BUTTONS
+        ================================================== */
+
+        .report-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .report-btn {
+            min-height: 43px;
+            padding: 11px 17px;
+            border: none;
+            border-radius: 9px;
+            background: var(--report-brown);
+            color: #FFFFFF;
+            font-family: var(--font-body);
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background .2s, transform .2s;
+        }
+
+        .report-btn:hover {
+            transform: translateY(-1px);
+            background: #5E402D;
+        }
+
+        .report-btn:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .report-btn.secondary {
+            background: #E8DED2;
+            color: #39271C;
+        }
+
+        .report-btn.secondary:hover {
+            background: #DCCDBD;
+        }
+
+        .report-btn.green {
+            background: var(--report-green);
+            color: #FFFFFF;
+        }
+
+        .report-btn.green:hover {
+            background: #1E603B;
+        }
+
+        /* ==================================================
+           MESSAGE
+        ================================================== */
+
+        .report-message {
+            min-height: 18px;
+            margin-top: 15px;
+            color: var(--report-red);
+            font-family: var(--font-body);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        /* ==================================================
+           TRANSACTION TABLE
+        ================================================== */
+
+        .report-table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 10px;
+        }
+
+        .report-table {
+            width: 100%;
+            min-width: 850px;
+            border-collapse: collapse;
+        }
+
+        .report-table th {
+            padding: 15px 12px;
+            background: #EEE6DC;
+            color: var(--report-brown);
+            font-family: var(--font-body);
+            font-size: 11px;
+            font-weight: 800;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .report-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid var(--report-border);
+            color: var(--report-text);
+            font-family: var(--font-body);
+            font-size: 12px;
+            font-weight: 400;
+            vertical-align: middle;
+        }
+
+        .report-table tbody tr {
+            transition: background .2s;
+        }
+
+        .report-table tbody tr:hover {
+            background: #F1E9DF;
+        }
+
+        .report-type {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-family: var(--font-body);
+            font-size: 10px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .report-type.in {
+            background: #D9EFE0;
+            color: #18713D;
+        }
+
+        .report-type.out {
+            background: #F9DED9;
+            color: #B83C2D;
+        }
+
+        .report-type.opening {
+            background: #E7E0F5;
+            color: #6745A1;
+        }
+
+        .report-total {
+            color: var(--report-brown);
+            font-family: var(--font-body);
+            font-weight: 800;
+        }
+
+        /* ==================================================
+           FOOTER
+        ================================================== */
+
+        .report-footer {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 20px;
+            color: var(--report-muted);
+            font-family: var(--font-body);
+            font-size: 12px;
+        }
+
+        .report-count {
+            padding: 8px 13px;
+            border-radius: 20px;
+            background: #EEE6DC;
+            color: var(--report-brown);
+            font-weight: 700;
+        }
+
+        /* ==================================================
+           RESPONSIVE TABLET
+        ================================================== */
+
+        @media (max-width: 1100px) {
+            .report-cards {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .report-filters {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .report-analytics {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ==================================================
+           RESPONSIVE MOBILE
+        ================================================== */
+
+        @media (max-width: 650px) {
+            .report-content {
+                padding: 20px 16px;
+            }
+
+            .report-header {
+                margin-bottom: 23px;
+            }
+
+            .report-header h1 {
+                font-size: 33px;
+            }
+
+            .report-header p {
+                font-size: 13px;
+            }
+
+            .report-label {
+                font-size: 10px;
+                letter-spacing: 2px;
+            }
+
+            .report-cards,
+            .report-filters,
+            .inventory-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .report-stat {
+                padding: 21px;
+            }
+
+            .report-stat strong {
+                font-size: 32px;
+            }
+
+            .report-panel {
+                padding: 18px;
+                border-radius: 15px;
+            }
+
+            .panel-heading h2 {
+                font-size: 22px;
+            }
+
+            .panel-subtitle {
+                font-size: 12px;
+            }
+
+            .chart-container {
+                height: 260px;
+            }
+
+            .inventory-card {
+                padding: 20px;
+            }
+
+            .inventory-card strong {
+                font-size: 27px;
+            }
+
+            .report-actions {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .report-btn {
+                width: 100%;
+                padding: 11px 7px;
+                font-size: 11px;
+            }
+
+            .report-footer {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+
+        /* ==================================================
+           PRINT / PDF
+        ================================================== */
+
+        @media print {
+            @page {
+                size: A4 landscape;
+                margin: 12mm;
+            }
+
+            body {
+                background: #FFFFFF !important;
+            }
+
+            .sidebar,
+            .report-filters,
+            .report-actions,
+            .report-message {
+                display: none !important;
+            }
+
+            .app-container {
+                display: block !important;
+            }
+
+            .main-content,
+            .report-content {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .report-header h1 {
+                color: #30221B !important;
+            }
+
+            .report-header p {
+                color: #555555 !important;
+            }
+
+            .report-stat,
+            .inventory-card {
+                border: 1px solid #DDDDDD !important;
+                background: #EEEEEE !important;
+                color: #222222 !important;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+
+            .report-stat span,
+            .report-stat strong,
+            .inventory-card small,
+            .inventory-card strong {
+                color: #222222 !important;
+            }
+
+            .report-panel {
+                border: 1px solid #DDDDDD;
+                box-shadow: none;
+                break-inside: avoid;
+            }
+
+            .report-analytics {
+                grid-template-columns: 1.5fr 1fr;
+            }
+
+            .report-table {
+                min-width: 0;
+            }
+
+            .report-table th,
+            .report-table td {
+                padding: 7px 5px;
+                font-size: 9px;
+            }
+
+            .report-table-wrap {
+                overflow: visible;
+            }
+
+            .chart-container {
+                height: 230px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app-container">
+
+    <!-- ==========================================
+         SIDEBAR
+    =========================================== -->
+
+    <aside class="sidebar">
+
+        <a href="/" class="sidebar-brand" aria-label="SEDUH SENJA">
+    <img
+        src="/images/logo-seduh-senja.png"
+        alt="Logo SEDUH SENJA"
+    >
+</a>
+
+        <div class="sidebar-menu">
+
+            <p class="menu-title">MENU UTAMA</p>
+
+            <nav class="nav-menu">
+
+                <a href="/" class="nav-link">
+                    <span class="nav-icon">⌂</span>
+                    Dashboard
+                </a>
+
+                <a href="/inventory" class="nav-link">
+                    <span class="nav-icon">▦</span>
+                    Inventaris
+                </a>
+
+                <a href="/stock-in" class="nav-link">
+                    <span class="nav-icon">↙</span>
+                    Barang Masuk
+                </a>
+
+                <a href="/stock-out" class="nav-link">
+                    <span class="nav-icon">↗</span>
+                    Barang Keluar
+                </a>
+
+            </nav>
+
+            <p class="menu-title other-title">LAINNYA</p>
+
+            <nav class="nav-menu">
+
+                <a href="#" class="nav-link" aria-disabled="true">
+                    <span class="nav-icon">♙</span>
+                    Supplier
+                </a>
+
+                <a href="/reports" class="nav-link active" aria-current="page">
+                    <span class="nav-icon">▤</span>
+                    Laporan
+                </a>
+
+            </nav>
+
+        </div>
+
+        <div class="sidebar-footer">
+            <strong>SEDUH SENJA</strong>
+            <small>Coffee Inventory System</small>
+        </div>
+
+    </aside>
+
+    <!-- ==========================================
+         MAIN CONTENT
+    =========================================== -->
+
+    <main class="main-content report-content">
+
+        <!-- PAGE HEADER -->
+
+        <header class="report-header">
+
+            <span class="report-label">
+                INVENTORY MANAGEMENT
+            </span>
+
+            <h1>Laporan Inventaris</h1>
+
+            <p>
+                Pantau seluruh aktivitas barang masuk, barang keluar,
+                dan stok awal SEDUH SENJA.
+            </p>
+
+        </header>
+
+        <!-- ======================================
+             STATISTICS
+        ======================================= -->
+
+        <section class="report-cards">
+
+            <div class="report-stat">
+
+                <div class="stat-icon">📦</div>
+
+                <span>Total Barang Masuk</span>
+
+                <strong id="totalStockIn">0</strong>
+
+            </div>
+
+            <div class="report-stat">
+
+                <div class="stat-icon">☕</div>
+
+                <span>Total Barang Keluar</span>
+
+                <strong id="totalStockOut">0</strong>
+
+            </div>
+
+            <div class="report-stat">
+
+                <div class="stat-icon">📋</div>
+
+                <span>Total Transaksi</span>
+
+                <strong id="totalTransactions">0</strong>
+
+            </div>
+
+            <div class="report-stat">
+
+                <div class="stat-icon">🏷️</div>
+
+                <span>Produk Bertransaksi</span>
+
+                <strong id="totalProducts">0</strong>
+
+            </div>
+
+        </section>
+
+        <!-- ======================================
+             ANALYTICS
+        ======================================= -->
+
+        <section class="report-analytics">
+
+            <!-- MONTHLY CHART -->
+
+            <div class="report-panel">
+
+                <div class="panel-heading">
+
+                    <div>
+                        <h2>Grafik Aktivitas Inventaris</h2>
+
+                        <div class="panel-subtitle">
+                            Perbandingan barang masuk, barang keluar,
+                            dan stok awal setiap bulan.
+                        </div>
+                    </div>
+
+                    <span class="panel-icon">📈</span>
+
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+
+            </div>
+
+            <!-- TOP PRODUCTS -->
+
+            <div class="report-panel">
+
+                <div class="panel-heading">
+
+                    <div>
+                        <h2>Produk Terbanyak Keluar</h2>
+
+                        <div class="panel-subtitle">
+                            Lima produk berdasarkan jumlah barang keluar.
+                        </div>
+                    </div>
+
+                    <span class="panel-icon">🏆</span>
+
+                </div>
+
+                <div id="topProductsList">
+
+                    <p class="report-empty">
+                        Memuat analisis produk...
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ======================================
+             INVENTORY SUMMARY
+        ======================================= -->
+
+        <section class="report-panel">
+
+            <div class="panel-heading">
+
+                <div>
+                    <h2>Ringkasan Nilai Persediaan</h2>
+
+                    <div class="panel-subtitle">
+                        Informasi jumlah produk, total stok,
+                        dan estimasi nilai persediaan.
+                    </div>
+                </div>
+
+                <span class="panel-icon">💰</span>
+
+            </div>
+
+            <div class="inventory-grid">
+
+                <div class="inventory-card">
+
+                    <div class="inventory-icon">📦</div>
+
+                    <small>Total Produk Aktif</small>
+
+                    <strong id="inventoryProducts">0</strong>
+
+                </div>
+
+                <div class="inventory-card">
+
+                    <div class="inventory-icon">☕</div>
+
+                    <small>Total Unit Stok</small>
+
+                    <strong id="inventoryUnits">0</strong>
+
+                </div>
+
+                <div class="inventory-card">
+
+                    <div class="inventory-icon">💵</div>
+
+                    <small>Nilai Persediaan</small>
+
+                    <strong id="inventoryValue">Rp0</strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ======================================
+             FILTER REPORT
+        ======================================= -->
+
+        <section class="report-panel">
+
+            <div class="panel-heading">
+
+                <div>
+                    <h2>Filter Laporan</h2>
+
+                    <div class="panel-subtitle">
+                        Sesuaikan data berdasarkan tanggal,
+                        produk, dan jenis transaksi.
+                    </div>
+                </div>
+
+                <span class="panel-icon">🔎</span>
+
+            </div>
+
+            <div class="report-filters">
+
+                <div class="report-field">
+
+                    <label for="startDate">
+                        Tanggal Awal
+                    </label>
+
+                    <input
+                        type="date"
+                        id="startDate"
+                    >
+
+                </div>
+
+                <div class="report-field">
+
+                    <label for="endDate">
+                        Tanggal Akhir
+                    </label>
+
+                    <input
+                        type="date"
+                        id="endDate"
+                    >
+
+                </div>
+
+                <div class="report-field">
+
+                    <label for="productFilter">
+                        Pilih Produk
+                    </label>
+
+                    <select id="productFilter">
+                        <option value="">Semua Produk</option>
+                    </select>
+
+                </div>
+
+                <div class="report-field">
+
+                    <label for="typeFilter">
+                        Jenis Transaksi
+                    </label>
+
+                    <select id="typeFilter">
+
+                        <option value="">
+                            Semua Transaksi
+                        </option>
+
+                        <option value="IN">
+                            Barang Masuk
+                        </option>
+
+                        <option value="OUT">
+                            Barang Keluar
+                        </option>
+
+                        <option value="OPENING">
+                            Stok Awal
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="report-actions">
+
+                <button
+                    type="button"
+                    class="report-btn"
+                    id="filterButton"
+                >
+                    🔍 Terapkan Filter
+                </button>
+
+                <button
+                    type="button"
+                    class="report-btn secondary"
+                    id="resetButton"
+                >
+                    ↻ Reset Filter
+                </button>
+
+                <button
+                    type="button"
+                    class="report-btn green"
+                    id="excelButton"
+                >
+                    📊 Export Excel
+                </button>
+
+                <button
+                    type="button"
+                    class="report-btn secondary"
+                    id="pdfButton"
+                >
+                    📄 Cetak / PDF
+                </button>
+
+            </div>
+
+            <div
+                id="reportMessage"
+                class="report-message"
+                aria-live="polite"
+            ></div>
+
+        </section>
+
+        <!-- ======================================
+             TRANSACTION TABLE
+        ======================================= -->
+
+        <section class="report-panel">
+
+            <div class="panel-heading">
+
+                <div>
+                    <h2>Riwayat Transaksi Inventaris</h2>
+
+                    <div class="panel-subtitle">
+                        Daftar aktivitas inventaris SEDUH SENJA.
+                    </div>
+                </div>
+
+                <span class="panel-icon">📋</span>
+
+            </div>
+
+            <div class="report-table-wrap">
+
+                <table class="report-table">
+
+                    <thead>
+                        <tr>
+                            <th>KODE TRANSAKSI</th>
+                            <th>TANGGAL</th>
+                            <th>JENIS</th>
+                            <th>KODE PRODUK</th>
+                            <th>NAMA PRODUK</th>
+                            <th>JUMLAH</th>
+                            <th>SUPPLIER</th>
+                            <th>KETERANGAN</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="reportTable">
+
+                        <tr>
+                            <td colspan="8" class="report-empty">
+                                Memuat laporan inventaris...
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div class="report-footer">
+
+                <span>
+                    Menampilkan maksimal 1.000 transaksi terbaru.
+                </span>
+
+                <strong
+                    id="reportTotal"
+                    class="report-count"
+                >
+                    0 transaksi
+                </strong>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<!-- ==========================================
+     CHART.JS
+=========================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- ==========================================
+     REPORT JAVASCRIPT
+=========================================== -->
+
+<script src="/js/reports.js"></script>
+
+<!-- SIDEBAR JAVASCRIPT -->
+
+<script src="/js/sidebar.js"></script>
+
+</body>
+</html>

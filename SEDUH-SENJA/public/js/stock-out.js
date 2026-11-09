@@ -1,119 +1,57 @@
 
-"use strict";
-
-// ==========================================
-// 1. ELEMENT HTML
-// ==========================================
-
-const form = document.getElementById("stockOutForm");
-const productSelect = document.getElementById("productId");
-const quantityInput = document.getElementById("quantity");
-const dateInput = document.getElementById("transactionDate");
-const stockInfo = document.getElementById("stockInfo");
-const tableBody = document.getElementById("stockOutTable");
-const message = document.getElementById("stockOutMessage");
-const saveButton = document.getElementById("saveStockOut");
-
-const notesInput = document.getElementById("notes");
-
-let products = [];
-let isLoading = false;
-
-// ==========================================
-// 2. VALIDASI ELEMENT
-// ==========================================
-
-if (
-    !form ||
-    !productSelect ||
-    !quantityInput ||
-    !dateInput ||
-    !stockInfo ||
-    !tableBody ||
-    !message ||
-    !saveButton ||
-    !notesInput
-) {
-    console.error(
-        "Elemen HTML Barang Keluar tidak lengkap. Periksa ID elemen."
-    );
-} else {
+document.addEventListener("DOMContentLoaded", () => {
 
     // ==========================================
-    // 3. TANGGAL HARI INI
+    // 1. ELEMENT HTML
     // ==========================================
 
-    function getTodayDate() {
-        const today = new Date();
+    const form = document.getElementById("stockOutForm");
+    const productSelect = document.getElementById("productId");
+    const quantityInput = document.getElementById("quantity");
+    const dateInput = document.getElementById("transactionDate");
+    const notesInput = document.getElementById("notes");
 
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, "0");
-        const day = String(today.getDate()).padStart(2, "0");
+    const stockInfo = document.getElementById("stockInfo");
+    const message = document.getElementById("stockOutMessage");
+    const saveButton = document.getElementById("saveStockOut");
+    const tableBody = document.getElementById("stockOutTable");
 
-        return `${year}-${month}-${day}`;
-    }
+    // Pastikan seluruh elemen tersedia
+    const requiredElements = {
+        form,
+        productSelect,
+        quantityInput,
+        dateInput,
+        notesInput,
+        stockInfo,
+        message,
+        saveButton,
+        tableBody
+    };
 
-    dateInput.value = getTodayDate();
-
-    // ==========================================
-    // 4. ESCAPE HTML
-    // ==========================================
-
-    function escapeHTML(value) {
-        return String(value ?? "").replace(/[&<>"']/g, (char) => ({
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#039;"
-        })[char]);
-    }
-
-    // ==========================================
-    // 5. FORMAT ANGKA
-    // ==========================================
-
-    function formatNumber(value) {
-        return new Intl.NumberFormat("id-ID", {
-            maximumFractionDigits: 2
-        }).format(Number(value) || 0);
-    }
-
-    // ==========================================
-    // 6. FORMAT TANGGAL
-    // ==========================================
-
-    function formatDate(value) {
-        if (!value) return "-";
-
-        const date = String(value).slice(0, 10);
-        const parts = date.split("-");
-
-        if (parts.length !== 3) {
-            return escapeHTML(value);
+    for (const [name, element] of Object.entries(requiredElements)) {
+        if (!element) {
+            console.error(`Elemen HTML tidak ditemukan: ${name}`);
+            return;
         }
-
-        return `${parts[2]}-${parts[1]}-${parts[0]}`;
     }
 
     // ==========================================
-    // 7. MENAMPILKAN PESAN
+    // 2. STATE
     // ==========================================
 
-    function showMessage(text, type = "error") {
-        message.textContent = text;
-
-        message.style.color =
-            type === "success" ? "#287A48" : "#B84A3A";
-    }
+    let products = [];
+    let isSaving = false;
 
     // ==========================================
-    // 8. REQUEST API
+    // 3. API HELPER
     // ==========================================
 
     async function apiRequest(url, options = {}) {
+
         const response = await fetch(url, {
             ...options,
+            cache: "no-store",
             headers: {
                 ...(options.body ? {
                     "Content-Type": "application/json"
@@ -127,14 +65,12 @@ if (
         try {
             result = await response.json();
         } catch {
-            throw new Error(
-                "Server memberikan respons yang tidak valid."
-            );
+            throw new Error("Respons server tidak valid.");
         }
 
-        if (!response.ok || result.success === false) {
+        if (!response.ok || !result.success) {
             throw new Error(
-                result.message || `Request gagal (${response.status}).`
+                result.message || "Terjadi kesalahan pada server."
             );
         }
 
@@ -142,365 +78,522 @@ if (
     }
 
     // ==========================================
-    // 9. MEMUAT DATA PRODUK
+    // 4. HELPER FORMAT
+    // ==========================================
+
+    function formatNumber(value) {
+        return new Intl.NumberFormat("id-ID", {
+            maximumFractionDigits: 2
+        }).format(Number(value) || 0);
+    }
+
+    function formatDate(value) {
+
+        if (!value) return "-";
+
+        const date = new Date(
+            String(value).replace(" ", "T")
+        );
+
+        if (Number.isNaN(date.getTime())) {
+            return String(value);
+        }
+
+        return date.toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric"
+        });
+    }
+
+    function getLocalDate() {
+
+        const now = new Date();
+
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, "0");
+        const day = String(now.getDate()).padStart(2, "0");
+
+        return `${year}-${month}-${day}`;
+    }
+
+    function setMessage(text, success = false) {
+
+        message.textContent = text;
+
+        message.style.color = success
+            ? "#27834B"
+            : "#C0392B";
+    }
+
+    function clearMessage() {
+        message.textContent = "";
+    }
+
+    function createCell(value, className = "") {
+
+        const td = document.createElement("td");
+
+        td.textContent = value ?? "";
+
+        if (className) {
+            td.className = className;
+        }
+
+        return td;
+    }
+
+    function showEmptyHistory(text) {
+
+        tableBody.innerHTML = "";
+
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+
+        td.colSpan = 6;
+        td.className = "out-empty";
+        td.textContent = text;
+
+        tr.appendChild(td);
+        tableBody.appendChild(tr);
+    }
+
+    // ==========================================
+    // 5. MEMUAT DATA PRODUK
     // ==========================================
 
     async function loadProducts() {
-        try {
-            productSelect.innerHTML =
-                '<option value="">Memuat produk...</option>';
 
-            productSelect.disabled = true;
+        productSelect.innerHTML =
+            '<option value="">Memuat produk...</option>';
+
+        productSelect.disabled = true;
+
+        try {
 
             const result = await apiRequest("/api/products");
 
-            // Backend products.js mengirim result.products
+            // Backend menggunakan result.products
             products = Array.isArray(result.products)
                 ? result.products
                 : Array.isArray(result.data)
                     ? result.data
                     : [];
 
+            // Filter produk yang tidak diarsipkan
+            products = products.filter(product => {
+
+                return Number(product.is_archived ?? 0) === 0;
+            });
+
+            // Urutkan berdasarkan nama
+            products.sort((a, b) =>
+                String(a.name).localeCompare(String(b.name), "id")
+            );
+
             productSelect.innerHTML =
                 '<option value="">Pilih produk</option>';
 
-            if (products.length === 0) {
-                productSelect.innerHTML =
-                    '<option value="">Belum ada produk tersedia</option>';
+            products.forEach(product => {
 
-                stockInfo.textContent =
-                    "Belum ada produk aktif di Inventaris.";
-
-                return;
-            }
-
-            products.forEach((product) => {
                 const option = document.createElement("option");
-
-                const stock = Number(product.stock) || 0;
-                const unit = product.unit || "";
 
                 option.value = product.id;
 
                 option.textContent =
-                    `${product.code} - ${product.name} | Stok: ${formatNumber(stock)} ${unit}`;
-
-                // Produk dengan stok kosong tidak dapat dipilih
-                option.disabled = stock <= 0;
+                    `${product.code} - ${product.name}`;
 
                 productSelect.appendChild(option);
             });
 
-            productSelect.disabled = false;
+            if (products.length === 0) {
 
-            updateStockInfo();
+                productSelect.innerHTML =
+                    '<option value="">Belum ada produk tersedia</option>';
+            }
+
+            console.log(
+                "[STOCK OUT] Produk berhasil dimuat:",
+                products
+            );
 
         } catch (error) {
-            console.error("Load products error:", error);
+
+            console.error("[STOCK OUT] Load products:", error);
 
             products = [];
 
             productSelect.innerHTML =
                 '<option value="">Gagal memuat produk</option>';
 
-            stockInfo.textContent = error.message;
+            setMessage(error.message);
 
-            showMessage(
-                "Gagal mengambil data Inventaris: " + error.message
-            );
+        } finally {
+
+            productSelect.disabled = false;
+
+            updateStockInfo();
         }
     }
 
     // ==========================================
-    // 10. INFORMASI STOK PRODUK
+    // 6. INFORMASI STOK TERSEDIA
     // ==========================================
 
-    function updateStockInfo() {
+    function getSelectedProduct() {
+
         const productId = Number(productSelect.value);
 
-        const product = products.find(
-            (item) => Number(item.id) === productId
+        return products.find(product =>
+            Number(product.id) === productId
         );
+    }
+
+    function updateStockInfo() {
+
+        const product = getSelectedProduct();
 
         if (!product) {
+
             stockInfo.textContent =
                 "Pilih produk untuk melihat stok tersedia.";
 
             quantityInput.removeAttribute("max");
-            quantityInput.setCustomValidity("");
+
+            quantityInput.disabled = true;
 
             return;
         }
 
         const stock = Number(product.stock) || 0;
-        const unit = escapeHTML(product.unit);
+        const unit = product.unit || "";
 
-        stockInfo.innerHTML = `
-            Stok tersedia:
-            <strong>${formatNumber(stock)} ${unit}</strong>
-        `;
+        stockInfo.innerHTML = "";
+
+        const label = document.createElement("span");
+
+        label.textContent = "Stok tersedia: ";
+
+        const strong = document.createElement("strong");
+
+        strong.textContent =
+            `${formatNumber(stock)} ${unit}`;
+
+        stockInfo.append(label, strong);
 
         quantityInput.max = stock;
 
+        quantityInput.disabled = stock <= 0;
+
         if (stock <= 0) {
-            stockInfo.innerHTML += `
-                <br><strong style="color:#B84A3A">
-                    Stok produk kosong!
-                </strong>
-            `;
 
-            quantityInput.setCustomValidity(
-                "Produk tidak memiliki stok tersedia."
+            stockInfo.append(
+                document.createTextNode(" - Stok habis!")
             );
-
-            return;
-        }
-
-        if (Number(quantityInput.value) > stock) {
-            quantityInput.setCustomValidity(
-                `Stok tersedia hanya ${stock} ${product.unit}.`
-            );
-        } else {
-            quantityInput.setCustomValidity("");
         }
     }
 
-    productSelect.addEventListener(
-        "change",
-        updateStockInfo
-    );
+    productSelect.addEventListener("change", () => {
 
-    quantityInput.addEventListener(
-        "input",
-        updateStockInfo
-    );
+        updateStockInfo();
+
+        clearMessage();
+
+        quantityInput.value = "";
+    });
 
     // ==========================================
-    // 11. MEMUAT RIWAYAT BARANG KELUAR
+    // 7. MEMUAT RIWAYAT TRANSAKSI
     // ==========================================
 
-    async function loadStockOutHistory() {
+    async function loadHistory() {
+
+        showEmptyHistory("Memuat riwayat transaksi...");
+
         try {
+
             const result = await apiRequest("/api/stock-out");
 
-            // Mendukung beberapa format respons backend
             const transactions = Array.isArray(result.data)
                 ? result.data
-                : Array.isArray(result.transactions)
-                    ? result.transactions
-                    : Array.isArray(result.stockOut)
-                        ? result.stockOut
-                        : [];
+                : [];
+
+            tableBody.innerHTML = "";
 
             if (transactions.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="out-empty">
-                            Belum ada transaksi barang keluar.
-                        </td>
-                    </tr>
-                `;
+
+                showEmptyHistory(
+                    "Belum ada transaksi barang keluar."
+                );
 
                 return;
             }
 
-            tableBody.innerHTML = transactions.map((item) => `
-                <tr>
-                    <td class="out-code">
-                        ${escapeHTML(item.transaction_code)}
-                    </td>
+            transactions.forEach(item => {
 
-                    <td>
-                        ${formatDate(item.transaction_date)}
-                    </td>
+                const tr = document.createElement("tr");
 
-                    <td>
-                        ${escapeHTML(item.product_code)}
-                    </td>
+                // Kode transaksi
+                tr.appendChild(
+                    createCell(
+                        item.transaction_code,
+                        "out-code"
+                    )
+                );
 
-                    <td>
-                        ${escapeHTML(item.product_name)}
-                    </td>
+                // Tanggal
+                tr.appendChild(
+                    createCell(
+                        formatDate(item.transaction_date)
+                    )
+                );
 
-                    <td>
-                        <span class="out-badge">
-                            -${formatNumber(item.quantity)}
-                            ${escapeHTML(item.unit)}
-                        </span>
-                    </td>
+                // Kode produk
+                tr.appendChild(
+                    createCell(item.product_code)
+                );
 
-                    <td>
-                        ${escapeHTML(item.notes || "-")}
-                    </td>
-                </tr>
-            `).join("");
+                // Nama produk
+                tr.appendChild(
+                    createCell(item.product_name)
+                );
+
+                // Jumlah keluar
+                tr.appendChild(
+                    createCell(
+                        `${formatNumber(item.quantity)} ${item.unit}`
+                    )
+                );
+
+                // Keterangan
+                tr.appendChild(
+                    createCell(item.notes || "-")
+                );
+
+                tableBody.appendChild(tr);
+            });
+
+            console.log(
+                "[STOCK OUT] Riwayat berhasil dimuat:",
+                transactions.length
+            );
 
         } catch (error) {
-            console.error("Load history error:", error);
 
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="6" class="out-empty">
-                        Gagal memuat riwayat transaksi.
-                    </td>
-                </tr>
-            `;
+            console.error("[STOCK OUT] Load history:", error);
+
+            showEmptyHistory(
+                "Gagal memuat riwayat transaksi."
+            );
         }
     }
 
     // ==========================================
-    // 12. SIMPAN TRANSAKSI BARANG KELUAR
+    // 8. VALIDASI TRANSAKSI
     // ==========================================
 
-    form.addEventListener("submit", async (event) => {
-        event.preventDefault();
+    function validateTransaction() {
 
-        if (isLoading) return;
+        const product = getSelectedProduct();
 
-        showMessage("");
-
-        const productId = Number(productSelect.value);
         const quantity = Number(quantityInput.value);
 
-        const product = products.find(
-            (item) => Number(item.id) === productId
-        );
+        const transactionDate = dateInput.value;
 
-        // Validasi produk
+        const notes = notesInput.value.trim();
+
         if (!product) {
-            showMessage(
+
+            throw new Error(
                 "Silakan pilih produk terlebih dahulu."
             );
-
-            productSelect.focus();
-            return;
         }
 
-        // Validasi stok
-        const availableStock = Number(product.stock);
-
-        if (availableStock <= 0) {
-            showMessage(
-                "Produk ini tidak memiliki stok tersedia."
-            );
-
-            return;
-        }
-
-        // Validasi jumlah
         if (!Number.isFinite(quantity) || quantity <= 0) {
-            showMessage(
+
+            throw new Error(
                 "Jumlah barang harus lebih dari 0."
             );
-
-            quantityInput.focus();
-            return;
         }
 
-        if (quantity > availableStock) {
-            showMessage(
-                `Stok tidak mencukupi. Tersedia ${formatNumber(availableStock)} ${product.unit}.`
+        if (quantity > Number(product.stock)) {
+
+            throw new Error(
+                `Stok tidak mencukupi. Stok tersedia: ${formatNumber(product.stock)} ${product.unit}.`
             );
-
-            quantityInput.focus();
-            return;
         }
 
-        // Validasi tanggal
-        if (!dateInput.value) {
-            showMessage("Tanggal transaksi wajib diisi.");
-            dateInput.focus();
-            return;
+        if (!transactionDate) {
+
+            throw new Error(
+                "Silakan pilih tanggal transaksi."
+            );
         }
 
-        const payload = {
-            product_id: productId,
-            quantity: quantity,
-            transaction_date: dateInput.value,
-            notes: notesInput.value.trim()
+        if (notes.length > 500) {
+
+            throw new Error(
+                "Keterangan maksimal 500 karakter."
+            );
+        }
+
+        return {
+            product,
+            product_id: Number(product.id),
+            quantity,
+            transaction_date: transactionDate,
+            notes
         };
+    }
 
-        isLoading = true;
+    // ==========================================
+    // 9. SIMPAN BARANG KELUAR
+    // ==========================================
+
+    form.addEventListener("submit", async event => {
+
+        event.preventDefault();
+
+        if (isSaving) return;
+
+        clearMessage();
+
+        let transaction;
+
+        try {
+
+            transaction = validateTransaction();
+
+        } catch (error) {
+
+            setMessage(error.message);
+
+            return;
+        }
+
+        isSaving = true;
 
         saveButton.disabled = true;
+
         saveButton.textContent = "Menyimpan...";
 
         try {
+
             const result = await apiRequest(
                 "/api/stock-out",
                 {
                     method: "POST",
-                    body: JSON.stringify(payload)
+
+                    body: JSON.stringify({
+                        product_id: transaction.product_id,
+                        quantity: transaction.quantity,
+                        transaction_date: transaction.transaction_date,
+                        notes: transaction.notes
+                    })
                 }
             );
 
-            const remainingStock =
-                result.remaining_stock !== undefined
-                    ? result.remaining_stock
-                    : availableStock - quantity;
-
-            const unit = result.unit || product.unit;
-
-            showMessage(
-                `${result.message || "Barang keluar berhasil disimpan."} Sisa stok: ${formatNumber(remainingStock)} ${unit}.`,
-                "success"
+            console.log(
+                "[STOCK OUT] Transaksi berhasil:",
+                result
             );
 
-            // Reset form
+            // Reset form terlebih dahulu
             form.reset();
 
-            dateInput.value = getTodayDate();
+            dateInput.value = getLocalDate();
 
-            // Perbarui data produk dan riwayat
-            await Promise.all([
+            // Perbarui produk dan riwayat dari database
+            const refreshResults = await Promise.allSettled([
                 loadProducts(),
-                loadStockOutHistory()
+                loadHistory()
             ]);
 
+            const refreshFailed = refreshResults.some(
+                item => item.status === "rejected"
+            );
+
+            const remainingStock =
+                result.product?.remaining_stock;
+
+            const remainingUnit =
+                result.product?.unit || transaction.product.unit;
+
+            let successMessage =
+                `${result.message} Kode: ${result.transaction_code}.`;
+
+            if (remainingStock !== undefined) {
+
+                successMessage +=
+                    ` Stok tersisa: ${formatNumber(remainingStock)} ${remainingUnit}.`;
+            }
+
+            if (refreshFailed) {
+
+                successMessage +=
+                    " Namun sebagian tampilan gagal diperbarui. Silakan refresh halaman.";
+            }
+
+            setMessage(successMessage, true);
+
+            updateStockInfo();
+
         } catch (error) {
-            console.error("Save stock-out error:", error);
 
-            showMessage(error.message);
+            console.error(
+                "[STOCK OUT] Save transaction:",
+                error
+            );
 
-            // Refresh stok terbaru jika transaksi gagal
+            setMessage(error.message);
+
+            // Ambil data stok terbaru
             await loadProducts();
 
+            updateStockInfo();
+
         } finally {
-            isLoading = false;
+
+            isSaving = false;
 
             saveButton.disabled = false;
-            saveButton.textContent = "Simpan Barang Keluar";
+
+            saveButton.textContent =
+                "Simpan Barang Keluar";
         }
     });
 
     // ==========================================
-    // 13. RESET FORM
+    // 10. RESET FORM
     // ==========================================
 
     form.addEventListener("reset", () => {
+
         setTimeout(() => {
-            dateInput.value = getTodayDate();
 
-            quantityInput.removeAttribute("max");
-            quantityInput.setCustomValidity("");
-
-            message.textContent = "";
+            dateInput.value = getLocalDate();
 
             updateStockInfo();
+
+            clearMessage();
+
         }, 0);
     });
 
     // ==========================================
-    // 14. INISIALISASI HALAMAN
+    // 11. INISIALISASI
     // ==========================================
 
-    async function initializeStockOut() {
-        await Promise.all([
-            loadProducts(),
-            loadStockOutHistory()
-        ]);
-    }
+    dateInput.value = getLocalDate();
 
-    initializeStockOut();
+    quantityInput.disabled = true;
 
-}
+    console.log(
+        "SEDUH SENJA - Stock Out System Initialized"
+    );
+
+    loadProducts();
+
+    loadHistory();
+
+});
