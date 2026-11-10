@@ -523,16 +523,22 @@
          SIDEBAR
     ======================================= -->
 
-    <aside class="sidebar">
+  <aside class="sidebar">
 
-        <a href="/" class="sidebar-brand" aria-label="SEDUH SENJA">
+        <!-- BRAND LOGO -->
+        <div class="sidebar-brand">
+
+           <a href="/" class="sidebar-brand" aria-label="SEDUH SENJA">
     <img
         src="/images/logo-seduh-senja.png"
         alt="Logo SEDUH SENJA"
     >
 </a>
+        </div>
 
-        <div class="sidebar-menu">
+
+        <!-- SIDEBAR NAVIGATION -->
+        <div class="sidebar-navigation">
 
             <p class="menu-title">MENU UTAMA</p>
 
@@ -558,32 +564,36 @@
                     <span>Barang Keluar</span>
                 </a>
 
-            </nav>
+                <a href="/categories" class="nav-link">
+                    <span class="nav-icon">▤</span>
+                    <span>Kategori</span>
+                </a>
 
-            <p class="menu-title">LAINNYA</p>
-
-            <nav class="nav-menu">
-
-                <a href="#" class="nav-link">
+                <a href="/suppliers" class="nav-link">
                     <span class="nav-icon">♙</span>
                     <span>Supplier</span>
                 </a>
 
+            </nav>
+
+
+            <!-- OTHER MENU -->
+            <p class="menu-title other-title">LAINNYA</p>
+
+            <nav class="nav-menu">
+
                 <a href="/reports" class="nav-link">
-                    <span class="nav-icon">▤</span>
+                    <span class="nav-icon">▧</span>
                     <span>Laporan</span>
+                </a>
+
+                <a href="/settings" class="nav-link">
+                    <span class="nav-icon">⚙</span>
+                    <span>Pengaturan</span>
                 </a>
 
             </nav>
 
-        </div>
-
-        <div class="sidebar-footer">
-            <strong>SEDUH SENJA</strong>
-            <br>
-            Coffee Inventory System
-            <br>
-            © 2026 All Rights Reserved
         </div>
 
     </aside>

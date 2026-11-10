@@ -2,25 +2,39 @@
 const Database = require("better-sqlite3");
 const path = require("path");
 const fs = require("fs");
-
 // ==========================================
 // 1. KONFIGURASI DATABASE
 // ==========================================
 
-const databaseFolder = path.join(__dirname, "..", "database");
-
-if (!fs.existsSync(databaseFolder)) {
-    fs.mkdirSync(databaseFolder, { recursive: true });
-}
-
-const databasePath = path.join(
-    databaseFolder,
-    "coffee_stock.db"
+// Lokasi database default untuk komputer lokal.
+const defaultDatabaseFolder = path.join(
+    __dirname,
+    "..",
+    "database"
 );
 
+// Railway menggunakan DATABASE_PATH.
+// Jika tidak tersedia, gunakan database lokal.
+const databasePath = process.env.DATABASE_PATH
+    ? path.resolve(process.env.DATABASE_PATH)
+    : path.join(
+        defaultDatabaseFolder,
+        "coffee_stock.db"
+    );
+
+// Pastikan folder database tersedia.
+const databaseFolder = path.dirname(databasePath);
+
+if (!fs.existsSync(databaseFolder)) {
+    fs.mkdirSync(databaseFolder, {
+        recursive: true
+    });
+}
+
+// Membuka koneksi SQLite.
 const db = new Database(databasePath);
 
-// Pengaturan SQLite
+// Pengaturan SQLite.
 db.pragma("journal_mode = WAL");
 db.pragma("foreign_keys = ON");
 db.pragma("busy_timeout = 5000");

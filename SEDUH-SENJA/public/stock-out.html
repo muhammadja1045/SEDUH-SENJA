@@ -8,109 +8,64 @@
 
     <title>Barang Keluar | SEDUH SENJA</title>
 
-    <!-- GOOGLE FONTS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- MAIN STYLESHEET -->
     <link rel="stylesheet" href="/css/style.css">
 
     <style>
-        /* ==========================================
-           STOCK OUT - PAGE
-        ========================================== */
-
         .out-page {
-            width: 100%;
-            padding: 0;
-            color: #30221B;
-            font-family: 'Inter', sans-serif;
+            padding: 30px;
+            color: #F5EBDD;
         }
 
-        /* PAGE HEADER */
-
         .out-heading {
-            margin-bottom: 30px;
+            margin-bottom: 26px;
         }
 
         .out-heading .eyebrow {
-            display: block;
-            margin-bottom: 12px;
-
-            color: #B98255;
-
-            font-family: 'Inter', sans-serif;
-            font-size: 12px;
+            color: #B58A62;
+            font-size: 11px;
             font-weight: 700;
-            letter-spacing: 2.5px;
-            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         .out-heading h1 {
-            margin: 0;
-
-            color: #30221B;
-
             font-family: 'DM Serif Display', serif;
-            font-size: 42px;
-            font-weight: 400;
-            line-height: 1.2;
-            letter-spacing: -0.5px;
+            font-size: 34px;
+            margin: 8px 0;
         }
 
         .out-heading p {
-            margin-top: 10px;
-
-            color: #8B8178;
-
-            font-family: 'Inter', sans-serif;
+            color: #B9AAA0;
             font-size: 14px;
-            font-weight: 400;
-            line-height: 1.8;
         }
 
-        /* CARD */
-
         .out-card {
+            background: #F7F3ED;
+            color: #241A16;
+            border-radius: 16px;
             padding: 26px;
             margin-bottom: 24px;
-
-            color: #30221B;
-            background: #FFFFFF;
-
-            border: 1px solid #EAE4DC;
-            border-radius: 14px;
-
-            box-shadow: 0 4px 15px rgba(36, 26, 22, .05);
+            box-shadow: 0 8px 25px rgba(0,0,0,.12);
         }
 
         .out-card h2 {
-            margin: 0 0 24px;
-
-            color: #30221B;
-
-            font-family: 'DM Serif Display', serif;
-            font-size: 25px;
-            font-weight: 400;
-            line-height: 1.3;
+            font-size: 19px;
+            margin: 0 0 22px;
         }
-
-        /* FORM */
 
         .out-form {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 20px;
+            gap: 18px;
         }
 
         .out-field {
             display: flex;
             flex-direction: column;
             gap: 8px;
-
-            min-width: 0;
         }
 
         .out-field.full {
@@ -118,11 +73,8 @@
         }
 
         .out-field label {
-            color: #30221B;
-
-            font-family: 'Inter', sans-serif;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .out-field input,
@@ -130,225 +82,138 @@
         .out-field textarea {
             width: 100%;
             padding: 13px 14px;
-
-            color: #30221B;
-            background: #FFFFFF;
-
-            border: 1px solid #E7DDD2;
+            border: 1px solid #DED2C3;
             border-radius: 9px;
-
-            font-family: 'Inter', sans-serif;
+            background: #FFFFFF;
+            color: #241A16;
+            font: inherit;
             font-size: 14px;
-            font-weight: 400;
-
+            box-sizing: border-box;
             outline: none;
-
-            transition: border-color .2s ease, box-shadow .2s ease;
         }
 
         .out-field input:focus,
         .out-field select:focus,
         .out-field textarea:focus {
-            border-color: #B98255;
-            box-shadow: 0 0 0 3px rgba(185,130,85,.12);
-        }
-
-        .out-field input::placeholder,
-        .out-field textarea::placeholder {
-            color: #A18E7E;
-            opacity: 1;
+            border-color: #98704E;
+            box-shadow: 0 0 0 3px rgba(152,112,78,.12);
         }
 
         .out-field textarea {
-            min-height: 100px;
+            min-height: 90px;
             resize: vertical;
         }
 
-        /* STOCK INFORMATION */
-
         .out-stock-info {
-            padding: 14px 16px;
-            margin-top: 3px;
-
-            color: #79543A;
-            background: #F5F0E9;
-
-            border: 1px solid #E9DFD0;
+            background: #EDE5DA;
             border-radius: 9px;
-
-            font-family: 'Inter', sans-serif;
+            padding: 13px 15px;
+            color: #63452F;
             font-size: 13px;
-            line-height: 1.7;
+            margin-top: 2px;
         }
 
         .out-stock-info strong {
-            color: #30221B;
             font-size: 17px;
-            font-weight: 700;
         }
-
-        /* ACTION BUTTONS */
 
         .out-actions {
             display: flex;
-            flex-wrap: wrap;
             gap: 12px;
-
-            margin-top: 24px;
+            margin-top: 22px;
         }
 
         .out-button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-
-            min-height: 44px;
-            padding: 12px 21px;
-
             border: none;
             border-radius: 9px;
-
-            font-family: 'Inter', sans-serif;
-            font-size: 13px;
-            font-weight: 600;
-
+            padding: 13px 20px;
+            font: inherit;
+            font-weight: 700;
             cursor: pointer;
-
-            transition: all .2s ease;
+            transition: .2s;
         }
 
         .out-submit {
-            color: #FFFFFF;
-            background: #79543A;
+            background: #6F4E37;
+            color: white;
         }
 
         .out-submit:hover {
             background: #513825;
-            transform: translateY(-1px);
         }
 
         .out-submit:disabled {
             opacity: .6;
             cursor: not-allowed;
-            transform: none;
         }
 
         .out-reset {
-            color: #79543A;
-            background: #F1E8DF;
-
-            border: 1px solid #E7DDD2;
+            background: #E7DDD1;
+            color: #513825;
         }
-
-        .out-reset:hover {
-            color: #FFFFFF;
-            background: #956B48;
-        }
-
-        /* MESSAGE */
 
         .out-message {
             margin-top: 16px;
-
-            color: #79543A;
-
-            font-family: 'Inter', sans-serif;
             font-size: 13px;
             font-weight: 600;
-            line-height: 1.6;
         }
 
-        /* TABLE */
-
         .out-table-wrap {
-            width: 100%;
             overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
         }
 
         .out-table {
             width: 100%;
             min-width: 720px;
-
             border-collapse: collapse;
-            white-space: nowrap;
         }
 
         .out-table th,
         .out-table td {
             padding: 15px 12px;
-
             text-align: left;
-            border-bottom: 1px solid #EAE4DC;
-
-            font-family: 'Inter', sans-serif;
-            font-size: 12px;
+            border-bottom: 1px solid #E6DDD2;
+            font-size: 13px;
         }
 
         .out-table th {
-            color: #79543A;
-            background: #FAF8F5;
-
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: .7px;
+            color: #806044;
+            font-size: 11px;
+            letter-spacing: .5px;
         }
 
         .out-table td {
             color: #46372D;
-            font-weight: 400;
-        }
-
-        .out-table tbody tr {
-            transition: background .2s ease;
-        }
-
-        .out-table tbody tr:hover {
-            background: #FCFAF7;
         }
 
         .out-code {
+            font-weight: 700;
             color: #805A3D !important;
-            font-weight: 700 !important;
         }
 
         .out-empty {
-            padding: 30px !important;
-
-            color: #95877C !important;
             text-align: center !important;
+            padding: 30px !important;
+            color: #95877C !important;
         }
-
-        /* BADGE */
 
         .out-badge {
             display: inline-block;
             padding: 5px 10px;
-
-            color: #A64C36;
-            background: #F5E1D9;
-
             border-radius: 20px;
-
-            font-family: 'Inter', sans-serif;
+            background: #F5E1D9;
+            color: #A64C36;
             font-size: 11px;
             font-weight: 700;
         }
 
-        /* RESPONSIVE */
-
-        @media (max-width: 768px) {
-            .out-heading h1 {
-                font-size: 34px;
-            }
-
-            .out-heading p {
-                font-size: 13px;
+        @media(max-width: 768px) {
+            .out-page {
+                padding: 18px;
             }
 
             .out-form {
                 grid-template-columns: 1fr;
-                gap: 17px;
             }
 
             .out-field.full {
@@ -356,29 +221,11 @@
             }
 
             .out-card {
-                padding: 20px;
+                padding: 19px;
             }
 
-            .out-card h2 {
-                font-size: 22px;
-            }
-        }
-
-        @media (max-width: 420px) {
             .out-heading h1 {
-                font-size: 30px;
-            }
-
-            .out-card {
-                padding: 16px;
-            }
-
-            .out-actions {
-                flex-direction: column;
-            }
-
-            .out-button {
-                width: 100%;
+                font-size: 28px;
             }
         }
     </style>
@@ -391,37 +238,76 @@
     <!-- SIDEBAR -->
     <aside class="sidebar">
 
-     <a href="/" class="sidebar-brand" aria-label="SEDUH SENJA">
+        <!-- BRAND LOGO -->
+        <div class="sidebar-brand">
+
+           <a href="/" class="sidebar-brand" aria-label="SEDUH SENJA">
     <img
         src="/images/logo-seduh-senja.png"
         alt="Logo SEDUH SENJA"
     >
 </a>
-        <p class="menu-title">MENU UTAMA</p>
+        </div>
 
-        <nav class="nav-menu">
 
-            <a href="/" class="nav-link">
-                <span class="nav-icon">⌂</span>
-                Dashboard
-            </a>
+        <!-- SIDEBAR NAVIGATION -->
+        <div class="sidebar-navigation">
 
-            <a href="/inventory" class="nav-link">
-                <span class="nav-icon">▦</span>
-                Inventaris
-            </a>
+            <p class="menu-title">MENU UTAMA</p>
 
-            <a href="/stock-in" class="nav-link">
-                <span class="nav-icon">↙</span>
-                Barang Masuk
-            </a>
+            <nav class="nav-menu">
 
-            <a href="/stock-out" class="nav-link active">
-                <span class="nav-icon">↗</span>
-                Barang Keluar
-            </a>
+                <a href="/" class="nav-link">
+                    <span class="nav-icon">⌂</span>
+                    <span>Dashboard</span>
+                </a>
 
-        </nav>
+                <a href="/inventory" class="nav-link">
+                    <span class="nav-icon">▦</span>
+                    <span>Inventaris</span>
+                </a>
+
+                <a href="/stock-in" class="nav-link">
+                    <span class="nav-icon">↙</span>
+                    <span>Barang Masuk</span>
+                </a>
+
+                <a href="/stock-out" class="nav-link active">
+                    <span class="nav-icon">↗</span>
+                    <span>Barang Keluar</span>
+                </a>
+
+                <a href="/categories" class="nav-link">
+                    <span class="nav-icon">▤</span>
+                    <span>Kategori</span>
+                </a>
+
+                <a href="/suppliers" class="nav-link">
+                    <span class="nav-icon">♙</span>
+                    <span>Supplier</span>
+                </a>
+
+            </nav>
+
+
+            <!-- OTHER MENU -->
+            <p class="menu-title other-title">LAINNYA</p>
+
+            <nav class="nav-menu">
+
+                <a href="/reports" class="nav-link">
+                    <span class="nav-icon">▧</span>
+                    <span>Laporan</span>
+                </a>
+
+                <a href="/settings" class="nav-link">
+                    <span class="nav-icon">⚙</span>
+                    <span>Pengaturan</span>
+                </a>
+
+            </nav>
+
+        </div>
 
     </aside>
 
@@ -430,20 +316,10 @@
 
         <div class="out-page">
 
-            <!-- PAGE HEADER -->
             <header class="out-heading">
-
-                <div class="eyebrow">
-                    INVENTORY MANAGEMENT
-                </div>
-
+                <span class="eyebrow">INVENTORY MANAGEMENT</span>
                 <h1>Barang Keluar</h1>
-
-                <p>
-                    Kelola dan catat setiap penggunaan bahan baku
-                    serta produk SEDUH SENJA.
-                </p>
-
+                <p>Kelola dan catat setiap penggunaan bahan baku serta produk SEDUH SENJA.</p>
             </header>
 
             <!-- FORM BARANG KELUAR -->
@@ -456,10 +332,7 @@
                     <div class="out-form">
 
                         <div class="out-field full">
-
-                            <label for="productId">
-                                Pilih Produk *
-                            </label>
+                            <label for="productId">Pilih Produk *</label>
 
                             <select id="productId" required>
                                 <option value="">Memuat produk...</option>
@@ -468,29 +341,15 @@
                             <div class="out-stock-info" id="stockInfo">
                                 Pilih produk untuk melihat stok tersedia.
                             </div>
-
                         </div>
 
                         <div class="out-field">
-
-                            <label for="transactionDate">
-                                Tanggal Keluar *
-                            </label>
-
-                            <input
-                                type="date"
-                                id="transactionDate"
-                                required
-                            >
-
+                            <label for="transactionDate">Tanggal Keluar *</label>
+                            <input type="date" id="transactionDate" required>
                         </div>
 
                         <div class="out-field">
-
-                            <label for="quantity">
-                                Jumlah Barang Keluar *
-                            </label>
-
+                            <label for="quantity">Jumlah Barang Keluar *</label>
                             <input
                                 type="number"
                                 id="quantity"
@@ -499,26 +358,19 @@
                                 placeholder="Contoh: 5"
                                 required
                             >
-
                         </div>
 
                         <div class="out-field full">
-
-                            <label for="notes">
-                                Keterangan / Catatan
-                            </label>
-
+                            <label for="notes">Keterangan / Catatan</label>
                             <textarea
                                 id="notes"
                                 placeholder="Contoh: Penggunaan bahan baku untuk produksi kopi..."
                             ></textarea>
-
                         </div>
 
                     </div>
 
                     <div class="out-actions">
-
                         <button
                             type="submit"
                             class="out-button out-submit"
@@ -533,14 +385,9 @@
                         >
                             Reset
                         </button>
-
                     </div>
 
-                    <p
-                        id="stockOutMessage"
-                        class="out-message"
-                        role="status"
-                    ></p>
+                    <p id="stockOutMessage" class="out-message" role="status"></p>
 
                 </form>
 
@@ -567,13 +414,11 @@
                         </thead>
 
                         <tbody id="stockOutTable">
-
                             <tr>
                                 <td colspan="6" class="out-empty">
                                     Memuat riwayat transaksi...
                                 </td>
                             </tr>
-
                         </tbody>
 
                     </table>
@@ -588,9 +433,8 @@
 
 </div>
 
-<!-- JAVASCRIPT -->
 <script src="/js/stock-out.js?v=2"></script>
 <script src="/js/sidebar.js"></script>
-
+</body>
 </body>
 </html>

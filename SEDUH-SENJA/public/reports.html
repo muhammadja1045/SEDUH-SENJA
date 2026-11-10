@@ -767,16 +767,22 @@
          SIDEBAR
     =========================================== -->
 
-    <aside class="sidebar">
+      <aside class="sidebar">
 
-        <a href="/" class="sidebar-brand" aria-label="SEDUH SENJA">
+        <!-- BRAND LOGO -->
+        <div class="sidebar-brand">
+
+           <a href="/" class="sidebar-brand" aria-label="SEDUH SENJA">
     <img
         src="/images/logo-seduh-senja.png"
         alt="Logo SEDUH SENJA"
     >
 </a>
+        </div>
 
-        <div class="sidebar-menu">
+
+        <!-- SIDEBAR NAVIGATION -->
+        <div class="sidebar-navigation">
 
             <p class="menu-title">MENU UTAMA</p>
 
@@ -784,50 +790,58 @@
 
                 <a href="/" class="nav-link">
                     <span class="nav-icon">⌂</span>
-                    Dashboard
+                    <span>Dashboard</span>
                 </a>
 
                 <a href="/inventory" class="nav-link">
                     <span class="nav-icon">▦</span>
-                    Inventaris
+                    <span>Inventaris</span>
                 </a>
 
                 <a href="/stock-in" class="nav-link">
                     <span class="nav-icon">↙</span>
-                    Barang Masuk
+                    <span>Barang Masuk</span>
                 </a>
 
                 <a href="/stock-out" class="nav-link">
                     <span class="nav-icon">↗</span>
-                    Barang Keluar
+                    <span>Barang Keluar</span>
+                </a>
+
+                <a href="/categories" class="nav-link">
+                    <span class="nav-icon">▤</span>
+                    <span>Kategori</span>
+                </a>
+
+                <a href="/suppliers" class="nav-link">
+                    <span class="nav-icon">♙</span>
+                    <span>Supplier</span>
                 </a>
 
             </nav>
 
+
+            <!-- OTHER MENU -->
             <p class="menu-title other-title">LAINNYA</p>
 
             <nav class="nav-menu">
 
-                <a href="#" class="nav-link" aria-disabled="true">
-                    <span class="nav-icon">♙</span>
-                    Supplier
+                <a href="/reports" class="nav-link active">
+                    <span class="nav-icon">▧</span>
+                    <span>Laporan</span>
                 </a>
 
-                <a href="/reports" class="nav-link active" aria-current="page">
-                    <span class="nav-icon">▤</span>
-                    Laporan
+                <a href="/settings" class="nav-link">
+                    <span class="nav-icon">⚙</span>
+                    <span>Pengaturan</span>
                 </a>
 
             </nav>
 
         </div>
 
-        <div class="sidebar-footer">
-            <strong>SEDUH SENJA</strong>
-            <small>Coffee Inventory System</small>
-        </div>
-
     </aside>
+
 
     <!-- ==========================================
          MAIN CONTENT
